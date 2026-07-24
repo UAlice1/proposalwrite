@@ -110,16 +110,23 @@ export function AppSidebarContent({
 
       {/* ── Top header: Logo + toggle ──────────────────────────── */}
       <div className="flex items-center justify-between px-3 py-4 pb-5 shrink-0 overflow-visible">
-        <div className="flex items-end gap-1">
+        <motion.div
+          className="flex items-center gap-0"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.1, ease: "easeOut" }}
+        >
           <Image
             src="/images/pryro.png"
             alt="Pryro logo"
-            width={64}
-            height={64}
+            width={48}
+            height={48}
             className="rounded-md shrink-0"
           />
-          <span className="text-sm font-bold tracking-tight text-[var(--sidebar-foreground)] pb-0.5">SOPs</span>
-        </div>
+          <span className="text-sm font-medium tracking-tight text-[var(--sidebar-foreground)]">
+            SOPs
+          </span>
+        </motion.div>
         <SidebarPanelToggle />
       </div>
 
@@ -223,13 +230,13 @@ function CollapsedSidebar({ user }: { user: NextAuthUser }) {
       <button
         onClick={() => setSidebarCollapsed(false)}
         aria-label="Expand sidebar"
-        className="flex items-center justify-center w-9 h-9 rounded-lg text-[var(--sidebar-foreground)]/40 hover:text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] transition-colors mb-1"
+        className="flex items-center justify-center w-9 h-9 rounded-lg hover:bg-[var(--sidebar-accent)] transition-colors mb-1"
       >
         <Image
           src="/images/pryro.png"
           alt="Pryro logo"
-          width={40}
-          height={40}
+          width={32}
+          height={32}
           className="rounded-md"
         />
       </button>
