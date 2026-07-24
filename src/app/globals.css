@@ -112,9 +112,9 @@
   --popover-foreground:   #F1F5F9;
 
   /* Primary stays blue in dark mode too */
-  --primary:              #3B82F6;
+  --primary:              #0D6CFE;
   --primary-foreground:   #ffffff;
-  --primary-hover:        #2563EB;
+  --primary-hover:        #0B56D4;
   --primary-light:        #1E3A5F;
 
   --secondary:            #1E293B;
@@ -127,7 +127,7 @@
   --destructive:          #EF4444;
   --border:               #334155;
   --input:                #334155;
-  --ring:                 #3B82F6;
+  --ring:                 #0D6CFE;
 
   --surface:              #1E293B;
 
