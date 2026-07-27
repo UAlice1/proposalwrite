@@ -166,6 +166,15 @@
     @apply font-sans;
     scroll-behavior: smooth;
   }
+  /* Override browser autofill sky-blue background */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+    box-shadow: 0 0 0px 1000px white inset !important;
+    -webkit-text-fill-color: inherit !important;
+  }
   ::selection {
     background: rgba(13, 108, 254, 0.15);
   }
