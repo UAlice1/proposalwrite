@@ -151,8 +151,8 @@ export function NewSOPPage() {
 
             {/* Card header with icon */}
             <div className="flex items-center gap-3 px-7 pt-6 pb-5">
-              <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shrink-0">
-                <FileText className="w-5 h-5 text-white" />
+              <div className="w-7 h-7 rounded-xl bg-primary flex items-center justify-center shrink-0">
+                <FileText className="w-3.5 h-3.5 text-white" />
               </div>
               <div>
                 <h2 className="text-base font-semibold">Create New SOP</h2>

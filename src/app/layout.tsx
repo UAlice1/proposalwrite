@@ -12,6 +12,11 @@ export const metadata: Metadata = {
   description:
     "Transform simple process descriptions into complete, professional Standard Operating Procedures using AI.",
   keywords: ["SOP", "Standard Operating Procedure", "AI", "documentation", "business process"],
+  icons: {
+    icon: "/icon.png",
+    shortcut: "/icon.png",
+    apple: "/icon.png",
+  },
 };
 
 export default function RootLayout({

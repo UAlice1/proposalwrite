@@ -29,6 +29,7 @@ import { useUIStore } from "@/lib/stores/ui-store";
 const BASE_NAV = [
   { href: "/sops/new",  label: "New SOP",  icon: Plus },
   { href: "/sops",      label: "My SOPs",  icon: FileText },
+  { href: "/settings",  label: "Settings", icon: Settings },
 ];
 
 function NavItem({
@@ -42,7 +43,6 @@ function NavItem({
   const pathname = usePathname();
 
   const isActive = (() => {
-    if (href.includes("?")) return false;
     if (href === "/sops/new") return pathname === "/sops/new";
     if (href === "/sops") return pathname === "/sops" || (pathname.startsWith("/sops/") && pathname !== "/sops/new");
     return pathname === href || pathname.startsWith(href + "/");
@@ -119,8 +119,8 @@ export function AppSidebarContent({
           <Image
             src="/images/pryro.png"
             alt="Pryro logo"
-            width={48}
-            height={48}
+            width={56}
+            height={56}
             className="rounded-md shrink-0"
           />
           <span className="text-sm font-medium tracking-tight text-[var(--sidebar-foreground)]">
