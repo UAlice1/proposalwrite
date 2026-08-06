@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String     @id @default(cuid())
+  email         String     @unique
+  name          String?
+  image         String?
+  plan          Plan       @default(FREE)
+  proposals     Proposal[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+enum Plan {
+  FREE
+  PRO
+}
+
+model Proposal {
+  id               String           @id @default(cuid())
+  title            String
+  clientName       String
+  clientIndustry   String?
+  projectScope     String?
+  budgetRange      String?
+  status           ProposalStatus   @default(DRAFT)
+  linkedSopId      String?
+  sections         ProposalSection[]
+  userId           String
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+}
+
+enum ProposalStatus {
+  DRAFT
+  REVIEW
+  SENT
+  ACCEPTED
+  REJECTED
+}
+
+model ProposalSection {
+  id          String       @id @default(cuid())
+  proposalId  String
+  proposal    Proposal     @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  type        SectionType
+  title       String
+  content     String       @db.Text
+  order       Int
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@unique([proposalId, type])
+}
+
+enum SectionType {
+  EXECUTIVE_SUMMARY
+  PROBLEM_STATEMENT
+  METHODOLOGY
+  TIMELINE
+  DELIVERABLES
+  PRICING
+  CONCLUSION
+}
