@@ -5,31 +5,26 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
-model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
-  password      String?
-  role          UserRole  @default(EMPLOYEE)
-  organizationId String?
-  departmentId  String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
 
-  organization  Organization? @relation(fields: [organizationId], references: [id])
-  department    Department?   @relation(fields: [departmentId], references: [id])
-  sops          SOP[]         @relation("SOPAuthor")
-  accounts      Account[]
-  sessions      Session[]
-  comments      Comment[]
-  approvals     Approval[]
-  activities    Activity[]
-  acknowledgements Acknowledgement[]
-  aiSettings    AISettings?
-  launchedInstances SOPInstance[]
-  completedTasks    ChecklistTaskExecution[]
+model User {
+  id             String    @id @default(cuid())
+  name           String?
+  email          String    @unique
+  emailVerified  DateTime?
+  image          String?
+  password       String?
+  role           UserRole  @default(EMPLOYEE)
+  organizationId String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organization Organization? @relation(fields: [organizationId], references: [id])
+  accounts     Account[]
+  sessions     Session[]
+  proposals    Proposal[]    @relation("ProposalAuthor")
+  activities   Activity[]
+  aiSettings   AISettings?
+  aiGenerations AIGeneration[]
 
   @@map("users")
 }
@@ -78,312 +73,129 @@ model Organization {
   name        String
   slug        String   @unique
   logo        String?
+  brandColor  String?
   description String?
+  plan        PlanTier @default(FREE)
+  proposalsThisMonth Int @default(0)
+  planResetAt DateTime @default(now())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  users       User[]
-  departments Department[]
-  categories  Category[]
-  sops        SOP[]
-  tags        Tag[]
+  users     User[]
+  proposals Proposal[]
 
   @@map("organizations")
 }
 
-model Department {
-  id             String   @id @default(cuid())
-  name           String
-  description    String?
-  organizationId String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  users        User[]
-  sops         SOP[]
-
-  @@map("departments")
-}
-
-model Category {
-  id             String   @id @default(cuid())
-  name           String
-  description    String?
-  color          String?
-  organizationId String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  sops         SOP[]
-
-  @@map("categories")
-}
-
-model SOP {
-  id             String    @id @default(cuid())
+model Proposal {
+  id             String         @id @default(cuid())
   title          String
+  clientName     String?
+  clientIndustry String?
+  proposalType   ProposalType   @default(GENERAL)
+  status         ProposalStatus @default(DRAFT)
+  tonePreference TonePreference @default(PROFESSIONAL)
   description    String?
-  purpose        String?
-  scope          String?
-  processName    String?
-  status         SOPStatus @default(DRAFT)
-  isAIGenerated  Boolean   @default(false)
-  isFavorite     Boolean   @default(false)
-  isArchived     Boolean   @default(false)
-  version        Int       @default(1)
+  budget         String?
+  timeline       String?
+  notes          String?
+  isAIGenerated  Boolean        @default(false)
+  isFavorite     Boolean        @default(false)
+  isArchived     Boolean        @default(false)
+  version        Int            @default(1)
   authorId       String
   organizationId String?
-  departmentId   String?
-  categoryId     String?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  publishedAt    DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  sentAt         DateTime?
+  archivedAt     DateTime?
   deletedAt      DateTime?
 
-  author           User          @relation("SOPAuthor", fields: [authorId], references: [id])
-  organization     Organization? @relation(fields: [organizationId], references: [id])
-  department       Department?   @relation(fields: [departmentId], references: [id])
-  category         Category?     @relation(fields: [categoryId], references: [id])
-  sections         SOPSection[]
-  workflowSteps    WorkflowStep[]
-  checklistItems   ChecklistItem[]
-  responsibilities Responsibility[]
-  resources        Resource[]
-  comments         Comment[]
-  approvals        Approval[]
-  versions         SOPVersion[]
-  activities       Activity[]
-  acknowledgements Acknowledgement[]
-  aiGenerations    AIGeneration[]
-  exportHistory    ExportHistory[]
-  tags             SOPTag[]
-  industry            String?
-  complianceFramework String?
-  documentation       SOPDocumentation?
-  instances           SOPInstance[]
-  assignments         SOPAssignment[]
+  author       User               @relation("ProposalAuthor", fields: [authorId], references: [id])
+  organization Organization?      @relation(fields: [organizationId], references: [id])
+  sections     ProposalSection[]
+  versions     ProposalVersion[]
+  activities   Activity[]
+  aiGenerations AIGeneration[]
+  exportHistory ExportHistory[]
 
-  @@map("sops")
+  @@map("proposals")
 }
 
-model SOPSection {
-  id        String   @id @default(cuid())
-  sopId     String
-  type      String
-  title     String
-  content   String
-  order     Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model ProposalSection {
+  id         String   @id @default(cuid())
+  proposalId String
+  key        String
+  title      String
+  content    String
+  order      Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-  sop SOP @relation(fields: [sopId], references: [id], onDelete: Cascade)
+  proposal Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
 
-  @@map("sop_sections")
+  @@map("proposal_sections")
 }
 
-model WorkflowStep {
-  id          String   @id @default(cuid())
-  sopId       String
-  stepNumber  Int
-  title       String
-  description String?
-  role        String?
-  duration    String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model ProposalVersion {
+  id         String   @id @default(cuid())
+  proposalId String
+  version    Int
+  title      String
+  content    Json
+  changes    String?
+  createdBy  String
+  createdAt  DateTime @default(now())
 
-  phase       String?
-  action      String?
-  dependsOn   Int[]
+  proposal Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
 
-  sop SOP @relation(fields: [sopId], references: [id], onDelete: Cascade)
-
-  @@map("workflow_steps")
-}
-
-model ChecklistItem {
-  id          String   @id @default(cuid())
-  sopId       String
-  text        String
-  isRequired  Boolean  @default(false)
-  order       Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  task         String?
-  assignedRole String?
-  priority     String?
-  isCompleted  Boolean  @default(false)
-  executions   ChecklistTaskExecution[]
-
-  sop SOP @relation(fields: [sopId], references: [id], onDelete: Cascade)
-
-  @@map("checklist_items")
-}
-
-model Responsibility {
-  id          String   @id @default(cuid())
-  sopId       String
-  role        String
-  description String
-  order       Int
-  createdAt   DateTime @default(now())
-
-  roleName        String?
-  coreDutySummary String?
-
-  sop         SOP             @relation(fields: [sopId], references: [id], onDelete: Cascade)
-  assignments SOPAssignment[]
-
-  @@map("responsibilities")
-}
-
-model Resource {
-  id          String   @id @default(cuid())
-  sopId       String
-  name        String
-  type        String?
-  description String?
-  order       Int
-  createdAt   DateTime @default(now())
-
-  sop SOP @relation(fields: [sopId], references: [id], onDelete: Cascade)
-
-  @@map("resources")
-}
-
-model Tag {
-  id             String   @id @default(cuid())
-  name           String
-  organizationId String
-  createdAt      DateTime @default(now())
-
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  sops         SOPTag[]
-
-  @@unique([organizationId, name])
-  @@map("tags")
-}
-
-model SOPTag {
-  sopId String
-  tagId String
-
-  sop SOP @relation(fields: [sopId], references: [id], onDelete: Cascade)
-  tag Tag @relation(fields: [tagId], references: [id], onDelete: Cascade)
-
-  @@id([sopId, tagId])
-  @@map("sop_tags")
-}
-
-model SOPVersion {
-  id        String   @id @default(cuid())
-  sopId     String
-  version   Int
-  title     String
-  content   Json
-  changes   String?
-  createdBy String
-  createdAt DateTime @default(now())
-  approvalId String?
-
-  sop      SOP      @relation(fields: [sopId], references: [id], onDelete: Cascade)
-  approval Approval? @relation(fields: [approvalId], references: [id], onDelete: SetNull)
-
-  @@map("sop_versions")
-}
-
-model Comment {
-  id        String   @id @default(cuid())
-  sopId     String
-  authorId  String
-  content   String
-  parentId  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  sop    SOP      @relation(fields: [sopId], references: [id], onDelete: Cascade)
-  author User     @relation(fields: [authorId], references: [id])
-  parent Comment? @relation("CommentReplies", fields: [parentId], references: [id])
-  replies Comment[] @relation("CommentReplies")
-
-  @@map("comments")
-}
-
-model Approval {
-  id        String         @id @default(cuid())
-  sopId     String
-  approverId String
-  status    ApprovalStatus @default(PENDING)
-  comment   String?
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
-
-  sop      SOP  @relation(fields: [sopId], references: [id], onDelete: Cascade)
-  approver User @relation(fields: [approverId], references: [id])
-  versions SOPVersion[]
-
-  @@map("approvals")
-}
-
-model Acknowledgement {
-  id           String   @id @default(cuid())
-  sopId        String
-  userId       String
-  acknowledgedAt DateTime @default(now())
-
-  sop  SOP  @relation(fields: [sopId], references: [id], onDelete: Cascade)
-  user User @relation(fields: [userId], references: [id])
-
-  @@unique([sopId, userId])
-  @@map("acknowledgements")
+  @@map("proposal_versions")
 }
 
 model Activity {
   id          String   @id @default(cuid())
-  sopId       String?
+  proposalId  String?
   userId      String
   action      String
   description String?
   metadata    Json?
   createdAt   DateTime @default(now())
 
-  sop  SOP?  @relation(fields: [sopId], references: [id], onDelete: SetNull)
-  user User  @relation(fields: [userId], references: [id])
+  proposal Proposal? @relation(fields: [proposalId], references: [id], onDelete: SetNull)
+  user     User      @relation(fields: [userId], references: [id])
 
   @@map("activities")
 }
 
 model AIGeneration {
-  id          String   @id @default(cuid())
-  sopId       String?
-  userId      String
-  provider    String
-  model       String
-  prompt      String
-  result      Json?
-  tokensUsed  Int?
-  cost        Float?
-  createdAt   DateTime @default(now())
+  id         String   @id @default(cuid())
+  proposalId String?
+  userId     String
+  provider   String
+  model      String
+  prompt     String
+  result     Json?
+  tokensUsed Int?
+  cost       Float?
+  createdAt  DateTime @default(now())
 
-  sop SOP? @relation(fields: [sopId], references: [id], onDelete: SetNull)
+  proposal Proposal? @relation(fields: [proposalId], references: [id], onDelete: SetNull)
+  user     User      @relation(fields: [userId], references: [id])
 
   @@map("ai_generations")
 }
 
 model AISettings {
-  id              String   @id @default(cuid())
-  userId          String   @unique
-  provider        String   @default("openai")
-  model           String   @default("gpt-4o-mini")
-  apiKey          String?
-  baseUrl         String?
-  temperature     Float    @default(0.7)
-  maxTokens       Int      @default(4000)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  provider    String   @default("openai")
+  model       String   @default("gpt-4o-mini")
+  apiKey      String?
+  baseUrl     String?
+  temperature Float    @default(0.7)
+  maxTokens   Int      @default(4000)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -392,13 +204,13 @@ model AISettings {
 
 model ExportHistory {
   id         String   @id @default(cuid())
-  sopId      String
+  proposalId String
   userId     String
   format     String
   fileName   String
   createdAt  DateTime @default(now())
 
-  sop SOP @relation(fields: [sopId], references: [id], onDelete: Cascade)
+  proposal Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
 
   @@map("export_history")
 }
@@ -407,85 +219,34 @@ enum UserRole {
   SUPER_ADMIN
   ORG_ADMIN
   MANAGER
-  APPROVER
-  EDITOR
   EMPLOYEE
 }
 
-enum SOPStatus {
+enum ProposalType {
+  CONSULTING
+  CONSTRUCTION
+  CREATIVE
+  IT_SOFTWARE
+  FREELANCE
+  GENERAL
+}
+
+enum ProposalStatus {
   DRAFT
   REVIEW
-  APPROVED
-  PUBLISHED
+  SENT
+  ACCEPTED
+  REJECTED
   ARCHIVED
 }
 
-enum ApprovalStatus {
-  PENDING
-  APPROVED
-  REJECTED
-  CHANGES_REQUESTED
+enum TonePreference {
+  PROFESSIONAL
+  CONVERSATIONAL
+  EXECUTIVE
 }
 
-model SOPDocumentation {
-  id                        String   @id @default(cuid())
-  sopId                     String   @unique
-  objective                 String?
-  scope                     String?
-  detailedProcedureMarkdown String?
-  safetyOrComplianceNotes   String?
-  createdAt                 DateTime @default(now())
-  updatedAt                 DateTime @updatedAt
-
-  sop SOP @relation(fields: [sopId], references: [id], onDelete: Cascade)
-
-  @@map("sop_documentations")
-}
-
-model SOPInstance {
-  id           String                   @id @default(cuid())
-  sopId        String
-  name         String
-  status       String                   @default("ACTIVE") // ACTIVE | COMPLETED
-  launchedById String
-  launchedAt   DateTime                 @default(now())
-  completedAt  DateTime?
-
-  sop            SOP                      @relation(fields: [sopId], references: [id], onDelete: Cascade)
-  launchedBy     User                     @relation(fields: [launchedById], references: [id])
-  taskExecutions ChecklistTaskExecution[]
-
-  @@map("sop_instances")
-}
-
-model ChecklistTaskExecution {
-  id              String    @id @default(cuid())
-  instanceId      String
-  checklistId     String
-  isCompleted     Boolean   @default(false)
-  completedById   String?
-  completedAt     DateTime?
-
-  instance      SOPInstance   @relation(fields: [instanceId], references: [id], onDelete: Cascade)
-  checklistItem ChecklistItem @relation(fields: [checklistId], references: [id], onDelete: Cascade)
-  completedBy   User?         @relation(fields: [completedById], references: [id])
-
-  @@map("checklist_task_executions")
-}
-
-model SOPAssignment {
-  id             String          @id @default(uuid())
-  sopId          String
-  email          String
-  assignedRoleId String?
-  status         String          @default("PENDING") // PENDING, ACCEPTED, COMPLETED
-  magicToken     String          @unique @default(uuid())
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-
-  sop            SOP             @relation(fields: [sopId], references: [id], onDelete: Cascade)
-  assignedRole   Responsibility? @relation(fields: [assignedRoleId], references: [id], onDelete: SetNull)
-
-  @@unique([sopId, email])
-  @@map("sop_assignments")
+enum PlanTier {
+  FREE
+  PAID
 }

@@ -27,9 +27,9 @@ import { useUIStore } from "@/lib/stores/ui-store";
 /* ─── Nav items ─────────────────────────────────────────────────────────── */
 
 const BASE_NAV = [
-  { href: "/sops/new",  label: "New SOP",  icon: Plus },
-  { href: "/sops",      label: "My SOPs",  icon: FileText },
-  { href: "/settings",  label: "Settings", icon: Settings },
+  { href: "/proposals/new", label: "New Proposal", icon: Plus },
+  { href: "/proposals",     label: "My Proposals", icon: FileText },
+  { href: "/settings",      label: "Settings",     icon: Settings },
 ];
 
 function NavItem({
@@ -43,8 +43,8 @@ function NavItem({
   const pathname = usePathname();
 
   const isActive = (() => {
-    if (href === "/sops/new") return pathname === "/sops/new";
-    if (href === "/sops") return pathname === "/sops" || (pathname.startsWith("/sops/") && pathname !== "/sops/new");
+    if (href === "/proposals/new") return pathname === "/proposals/new";
+    if (href === "/proposals") return pathname === "/proposals" || (pathname.startsWith("/proposals/") && pathname !== "/proposals/new");
     return pathname === href || pathname.startsWith(href + "/");
   })();
 
@@ -124,7 +124,7 @@ export function AppSidebarContent({
             className="rounded-md shrink-0"
           />
           <span className="text-sm font-medium tracking-tight text-[var(--sidebar-foreground)]">
-            SOPs
+            Writer
           </span>
         </motion.div>
         <SidebarPanelToggle />
@@ -137,7 +137,7 @@ export function AppSidebarContent({
           className="flex items-center gap-2 text-sm text-[var(--sidebar-foreground)]/50 hover:text-[var(--sidebar-foreground)] rounded-lg px-3 py-2 transition-colors hover:bg-[var(--sidebar-accent)] w-full"
         >
           <Search className="w-3.5 h-3.5 shrink-0" />
-          <span className="truncate">Search SOPs...</span>
+          <span className="truncate">Search proposals...</span>
           <kbd className="ml-auto text-[10px] border border-[var(--sidebar-border)] rounded px-1 py-0.5 bg-[var(--sidebar-accent)] hidden sm:block">
             ⌘K
           </kbd>

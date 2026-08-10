@@ -12,7 +12,7 @@ interface CommandPaletteProps {
   onOpenChange: (open: boolean) => void;
 }
 
-interface SOPResult {
+interface ProposalResult {
   id: string;
   title: string;
   status: string;
@@ -21,7 +21,7 @@ interface SOPResult {
 export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const router = useRouter();
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<SOPResult[]>([]);
+  const [results, setResults] = useState<ProposalResult[]>([]);
   const [loading, setLoading] = useState(false);
   const debouncedQuery = useDebounce(query, 300);
 
@@ -39,9 +39,9 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   useEffect(() => {
     if (!debouncedQuery) { setResults([]); return; }
     setLoading(true);
-    fetch(`/api/sops?search=${encodeURIComponent(debouncedQuery)}&limit=5`)
+    fetch(`/api/proposals?search=${encodeURIComponent(debouncedQuery)}&limit=5`)
       .then((r) => r.json())
-      .then((d) => setResults(d.sops ?? []))
+      .then((d) => setResults(d.proposals ?? []))
       .finally(() => setLoading(false));
   }, [debouncedQuery]);
 
@@ -52,8 +52,8 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   };
 
   const staticItems = [
-    { label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
-    { label: "New SOP", icon: Plus, href: "/sops/new" },
+    { label: "Dashboard",    icon: LayoutDashboard, href: "/dashboard" },
+    { label: "New Proposal", icon: Plus,            href: "/proposals/new" },
   ];
 
   return (
@@ -64,7 +64,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search SOPs or navigate..."
+            placeholder="Search proposals or navigate..."
             className="border-0 shadow-none focus-visible:ring-0 h-12"
             autoFocus
           />
@@ -75,16 +75,16 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
           )}
           {!loading && results.length > 0 && (
             <div className="mb-2">
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground px-2 py-1">SOPs</p>
-              {results.map((sop) => (
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground px-2 py-1">Proposals</p>
+              {results.map((p) => (
                 <button
-                  key={sop.id}
-                  onClick={() => navigate(`/sops/${sop.id}`)}
+                  key={p.id}
+                  onClick={() => navigate(`/proposals/${p.id}`)}
                   className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-accent text-left text-sm"
                 >
                   <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
-                  <span className="truncate">{sop.title}</span>
-                  <span className="ml-auto text-xs text-muted-foreground">{sop.status}</span>
+                  <span className="truncate">{p.title}</span>
+                  <span className="ml-auto text-xs text-muted-foreground">{p.status}</span>
                 </button>
               ))}
             </div>

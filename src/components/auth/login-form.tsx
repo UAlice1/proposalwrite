@@ -42,7 +42,7 @@ export function LoginForm() {
       if (result?.error) {
         toast.error("Invalid email or password", { description: "Please check your credentials and try again." });
       } else {
-        router.push("/sops/new");
+        router.push("/proposals/new");
         router.refresh();
       }
     } catch {
@@ -61,7 +61,7 @@ export function LoginForm() {
             {/* Brand */}
             <div className="text-center mb-5">
               <Link href="/" aria-label="go home" className="mx-auto inline-block mb-3">
-                <span className="text-base font-semibold">Pryro SOP</span>
+                <span className="text-base font-semibold">PryroWriter</span>
               </Link>
               <h1 className="text-lg font-semibold leading-tight">Sign In</h1>
               <p className="text-xs text-muted-foreground mt-0.5">Welcome back! Sign in to continue</p>

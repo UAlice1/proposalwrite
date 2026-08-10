@@ -61,8 +61,8 @@ export function RegisterForm() {
         toast.success("Account created! Please sign in.", { description: "Your account is ready. Sign in to get started." });
         router.push("/login");
       } else {
-        AuthToast.welcome("Pryro SOP");
-        router.push("/sops/new");
+        AuthToast.welcome(data.name);
+        router.push("/proposals/new");
         router.refresh();
       }
     } catch {
@@ -81,10 +81,10 @@ export function RegisterForm() {
             {/* Brand */}
             <div className="text-center mb-4">
               <Link href="/" aria-label="go home" className="mx-auto inline-block mb-2">
-                <span className="text-base font-semibold">Pryro SOP</span>
+                <span className="text-base font-semibold">PryroWriter</span>
               </Link>
               <h1 className="text-lg font-semibold leading-tight">Create an account</h1>
-              <p className="text-xs text-muted-foreground mt-0.5">Start generating professional SOPs with AI</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Start generating professional proposals with AI</p>
             </div>
 
             {/* Form */}

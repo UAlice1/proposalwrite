@@ -295,7 +295,7 @@ function AIProviderSettings() {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm">Generation Parameters</CardTitle>
-              <CardDescription className="text-xs">Fine-tune how the AI generates SOP content and chat responses.</CardDescription>
+              <CardDescription className="text-xs">Fine-tune how the AI generates proposal content.</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-4">

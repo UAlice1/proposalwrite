@@ -38,34 +38,51 @@ export function slugify(str: string): string {
 }
 
 export const STATUS_LABELS: Record<string, string> = {
-  DRAFT: "Draft",
-  REVIEW: "In Review",
-  APPROVED: "Approved",
-  PUBLISHED: "Published",
+  DRAFT:    "Draft",
+  REVIEW:   "In Review",
+  SENT:     "Sent",
+  ACCEPTED: "Accepted",
+  REJECTED: "Rejected",
   ARCHIVED: "Archived",
 };
 
 export const STATUS_COLORS: Record<string, string> = {
-  DRAFT: "bg-yellow-400 text-yellow-900",
-  REVIEW: "bg-blue-500 text-white",
-  APPROVED: "bg-green-500 text-white",
-  PUBLISHED: "bg-emerald-600 text-white",
+  DRAFT:    "bg-yellow-400 text-yellow-900",
+  REVIEW:   "bg-blue-500 text-white",
+  SENT:     "bg-purple-500 text-white",
+  ACCEPTED: "bg-green-500 text-white",
+  REJECTED: "bg-red-500 text-white",
   ARCHIVED: "bg-gray-500 text-white",
+};
+
+export const PROPOSAL_TYPE_LABELS: Record<string, string> = {
+  CONSULTING:   "Consulting",
+  CONSTRUCTION: "Construction",
+  CREATIVE:     "Creative",
+  IT_SOFTWARE:  "IT / Software",
+  FREELANCE:    "Freelance",
+  GENERAL:      "General",
+};
+
+export const TONE_LABELS: Record<string, string> = {
+  PROFESSIONAL:   "Professional",
+  CONVERSATIONAL: "Conversational",
+  EXECUTIVE:      "Executive",
 };
 
 export const ROLE_LABELS: Record<string, string> = {
   SUPER_ADMIN: "Super Admin",
-  ORG_ADMIN: "Organization Admin",
-  MANAGER: "Manager",
-  EMPLOYEE: "Employee",
+  ORG_ADMIN:   "Organization Admin",
+  MANAGER:     "Manager",
+  EMPLOYEE:    "Employee",
 };
 
 export const AI_PROVIDERS = [
-  { value: "openai", label: "OpenAI", models: ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-3.5-turbo"] },
-  { value: "anthropic", label: "Anthropic", models: ["claude-3-5-sonnet-20241022", "claude-3-haiku-20240307"] },
-  { value: "groq", label: "Groq", models: ["llama-3.3-70b-versatile", "mixtral-8x7b-32768", "gemma2-9b-it"] },
+  { value: "openai",     label: "OpenAI",     models: ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-3.5-turbo"] },
+  { value: "anthropic",  label: "Anthropic",  models: ["claude-3-5-sonnet-20241022", "claude-3-5-haiku-20241022", "claude-3-haiku-20240307"] },
+  { value: "groq",       label: "Groq",       models: ["llama-3.3-70b-versatile", "mixtral-8x7b-32768", "gemma2-9b-it"] },
   { value: "openrouter", label: "OpenRouter", models: ["openai/gpt-4o", "anthropic/claude-3.5-sonnet", "google/gemini-pro"] },
-  { value: "deepseek", label: "DeepSeek", models: ["deepseek-chat", "deepseek-reasoner"] },
-  { value: "mistral", label: "Mistral", models: ["mistral-large-latest", "mistral-small-latest"] },
-  { value: "custom", label: "Custom (OpenAI-compatible)", models: [] },
+  { value: "deepseek",   label: "DeepSeek",   models: ["deepseek-chat", "deepseek-reasoner"] },
+  { value: "mistral",    label: "Mistral",    models: ["mistral-large-latest", "mistral-small-latest"] },
+  { value: "custom",     label: "Custom (OpenAI-compatible)", models: [] },
 ];

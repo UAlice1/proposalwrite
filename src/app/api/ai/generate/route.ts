@@ -1,16 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { getAISettings, callAI, buildSOPGenerationPrompt } from "@/lib/ai";
+import { getAISettings, callAI, buildProposalGenerationPrompt } from "@/lib/ai";
 import { z } from "zod";
 
 const schema = z.object({
-  title: z.string().min(1),
-  processName: z.string().min(1),
-  description: z.string().min(10),
-  department: z.string().optional(),
-  company: z.string().optional(),
-  sopId: z.string().optional(),
+  title:           z.string().min(1),
+  proposalType:    z.enum(["CONSULTING","CONSTRUCTION","CREATIVE","IT_SOFTWARE","FREELANCE","GENERAL"]).default("GENERAL"),
+  yourCompanyName: z.string().min(1),
+  clientName:      z.string().min(1),
+  clientIndustry:  z.string().optional(),
+  projectDetails:  z.string().min(10),
+  scope:           z.string().optional(),
+  budget:          z.string().optional(),
+  timeline:        z.string().optional(),
+  tonePreference:  z.enum(["PROFESSIONAL","CONVERSATIONAL","EXECUTIVE"]).default("PROFESSIONAL"),
+  notes:           z.string().optional(),
+  proposalId:      z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -25,8 +31,8 @@ export async function POST(req: NextRequest) {
 
   try {
     const settings = await getAISettings(session.user.id);
-    const prompt = buildSOPGenerationPrompt(parsed.data);
-    const raw = await callAI(prompt, settings);
+    const prompt   = buildProposalGenerationPrompt(parsed.data);
+    const raw      = await callAI(prompt, settings);
 
     let result;
     try {
@@ -38,11 +44,11 @@ export async function POST(req: NextRequest) {
 
     await db.aIGeneration.create({
       data: {
-        sopId: parsed.data.sopId,
-        userId: session.user.id,
-        provider: settings.provider,
-        model: settings.model,
-        prompt: parsed.data.description,
+        proposalId: parsed.data.proposalId,
+        userId:     session.user.id,
+        provider:   settings.provider,
+        model:      settings.model,
+        prompt:     parsed.data.projectDetails,
         result,
       },
     });

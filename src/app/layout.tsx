@@ -6,12 +6,12 @@ import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: {
-    default: "Pryro SOP — AI-Powered SOP Generator",
-    template: "%s | Pryro SOP",
+    default: "PryroWriter — AI-Powered Proposal Generator",
+    template: "%s | PryroWriter",
   },
   description:
-    "Transform simple process descriptions into complete, professional Standard Operating Procedures using AI.",
-  keywords: ["SOP", "Standard Operating Procedure", "AI", "documentation", "business process"],
+    "Generate professional business proposals in minutes using AI. Built for African SMEs.",
+  keywords: ["proposal", "business proposal", "AI", "PryroWriter", "African SME"],
   icons: {
     icon: "/icon.png",
     shortcut: "/icon.png",

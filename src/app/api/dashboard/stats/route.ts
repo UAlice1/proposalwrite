@@ -11,103 +11,58 @@ export async function GET() {
   const role   = (session.user as { role?: string }).role ?? "EMPLOYEE";
   const orgId  = (session.user as { organizationId?: string }).organizationId;
 
-  const canViewAll  = Permission.canViewAllOrgSOPs(role);
-  const canApprove  = Permission.canApprove(role);
+  const canViewAll = Permission.canViewAllOrgProposals(role);
 
-  // Scope: org-wide for EDITOR+, own SOPs only for EMPLOYEE
-  const sopScope = canViewAll
+  const scope = canViewAll
     ? { organizationId: orgId ?? undefined, isArchived: false, deletedAt: null }
     : { authorId: userId, isArchived: false, deletedAt: null };
 
-  const [
-    total,
-    aiGenerated,
-    drafts,
-    inReview,
-    approved,
-    published,
-    pendingApprovalCount,
-    recent,
-    pendingApprovalSOPs,
-    recentActivity,
-    aiUsage,
-  ] = await Promise.all([
-    // ── Counts ───────────────────────────────────────────────────────────────
-    db.sOP.count({ where: sopScope }),
-    db.sOP.count({ where: { ...sopScope, isAIGenerated: true } }),
-    db.sOP.count({ where: { ...sopScope, status: "DRAFT" } }),
-    db.sOP.count({ where: { ...sopScope, status: "REVIEW" } }),
-    db.sOP.count({ where: { ...sopScope, status: "APPROVED" } }),
-    db.sOP.count({ where: { ...sopScope, status: "PUBLISHED" } }),
+  const [total, aiGenerated, drafts, sent, accepted, recent, recentActivity, aiUsage] = await Promise.all([
+    db.proposal.count({ where: scope }),
+    db.proposal.count({ where: { ...scope, isAIGenerated: true } }),
+    db.proposal.count({ where: { ...scope, status: "DRAFT" } }),
+    db.proposal.count({ where: { ...scope, status: "SENT" } }),
+    db.proposal.count({ where: { ...scope, status: "ACCEPTED" } }),
 
-    // ── Pending approvals for APPROVER+ ──────────────────────────────────────
-    canApprove
-      ? db.sOP.count({ where: { ...(orgId ? { organizationId: orgId } : {}), status: "REVIEW", deletedAt: null } })
-      : Promise.resolve(0),
-
-    // ── Recent SOPs (last 6) ─────────────────────────────────────────────────
-    db.sOP.findMany({
-      where:   sopScope,
+    db.proposal.findMany({
+      where:   scope,
       orderBy: { updatedAt: "desc" },
       take:    6,
       select:  {
         id: true, title: true, status: true, isAIGenerated: true,
         updatedAt: true, createdAt: true, version: true,
-        author:     { select: { id: true, name: true, image: true } },
-        department: { select: { name: true } },
-        category:   { select: { name: true, color: true } },
+        clientName: true, proposalType: true,
+        author: { select: { id: true, name: true, image: true } },
       },
     }),
 
-    // ── SOPs awaiting approval (for APPROVER+) — up to 5 ────────────────────
-    canApprove
-      ? db.sOP.findMany({
-          where:   { ...(orgId ? { organizationId: orgId } : {}), status: "REVIEW", deletedAt: null },
-          orderBy: { updatedAt: "asc" }, // oldest first — most urgent
-          take:    5,
-          select:  {
-            id: true, title: true, status: true, updatedAt: true,
-            author:     { select: { id: true, name: true, image: true } },
-            department: { select: { name: true } },
-          },
-        })
-      : Promise.resolve([]),
-
-    // ── Recent activity ──────────────────────────────────────────────────────
-    // Managers+ see org activity; employees see own activity
     db.activity.findMany({
-      where:   canViewAll && orgId
-        ? { sop: { organizationId: orgId } }
-        : { userId },
+      where:   canViewAll && orgId ? { proposal: { organizationId: orgId } } : { userId },
       orderBy: { createdAt: "desc" },
       take:    10,
       include: {
-        sop:  { select: { id: true, title: true } },
-        user: { select: { id: true, name: true, image: true } },
+        proposal: { select: { id: true, title: true } },
+        user:     { select: { id: true, name: true, image: true } },
       },
     }),
 
-    // ── AI usage ─────────────────────────────────────────────────────────────
     db.aIGeneration.count({ where: { userId } }),
   ]);
 
   return NextResponse.json({
-    // Counts
     total,
     aiGenerated,
     drafts,
-    inReview,
-    approved,
-    published,
-    pendingApprovalCount,
+    inReview: sent,
+    approved: accepted,
+    published: accepted,
+    pendingApprovalCount: 0,
     aiUsage,
-    // Lists
     recent,
-    pendingApprovalSOPs,
+    pendingApprovalSOPs: [],
     recentActivity,
-    // Meta
     role,
     canViewAll,
-    canApprove,
+    canApprove: false,
   });
 }

@@ -12,8 +12,8 @@ const ORG_EXEMPT_API = [
   "/api/assistant",
   "/api/chat",
   "/api/ai",
-  "/api/generate-sop",
-  "/api/sops",
+  "/api/proposals",
+  "/api/generate-proposal",
   "/api/dashboard",
   "/api/tags",
   "/api/admin/org",
@@ -28,22 +28,18 @@ const ORG_EXEMPT_API = [
 export default async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // ── 1. Always pass NextAuth endpoints through ─────────────────────────────
+  // Always pass NextAuth endpoints through
   if (pathname.startsWith(AUTH_API_PREFIX)) {
     return NextResponse.next();
   }
 
-  // ── Read JWT directly from cookie ─────────────────────────────────────────
   const secret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET ?? "";
 
   let token = null;
   try {
-    // Try NextAuth v5 cookie name first
     const isSecure = req.url.startsWith("https://");
     const cookieName = isSecure ? "__Secure-authjs.session-token" : "authjs.session-token";
     token = await getToken({ req, secret, cookieName, salt: cookieName });
-
-    // Fallback to v4 cookie name
     if (!token) {
       token = await getToken({ req, secret });
     }
@@ -55,15 +51,15 @@ export default async function proxy(req: NextRequest) {
   const role  = (token?.role  as string | undefined) ?? "EMPLOYEE";
   const orgId = (token?.organizationId as string | undefined) ?? null;
 
-  // ── 2. Auth pages — redirect logged-in users to dashboard ─────────────────
+  // Auth pages — redirect logged-in users to proposals
   if (PUBLIC_PAGES.includes(pathname)) {
     if (isAuthenticated) {
-      return NextResponse.redirect(new URL("/sops", req.url));
+      return NextResponse.redirect(new URL("/proposals", req.url));
     }
     return NextResponse.next();
   }
 
-  // ── 3 & 4. Require authentication ─────────────────────────────────────────
+  // Require authentication
   if (!isAuthenticated) {
     if (pathname.startsWith("/api/")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -73,14 +69,14 @@ export default async function proxy(req: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // ── 5. Admin API guard ────────────────────────────────────────────────────
+  // Admin API guard
   if (pathname.startsWith(ADMIN_API_PREFIX)) {
     if (role !== "SUPER_ADMIN" && role !== "ORG_ADMIN") {
       return NextResponse.json({ error: "Admin access required" }, { status: 403 });
     }
   }
 
-  // ── 6. Org isolation ──────────────────────────────────────────────────────
+  // Org isolation (relaxed — all proposal routes exempt)
   const skipOrgCheck = ORG_EXEMPT_API.some((p) => pathname.startsWith(p));
   if (
     pathname.startsWith("/api/") &&

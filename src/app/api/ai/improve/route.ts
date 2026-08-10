@@ -11,12 +11,12 @@ const schema = z.object({
 });
 
 const prompts: Record<string, (content: string, extra?: string) => string> = {
-  rewrite: (c) => `Rewrite the following SOP content to be more professional, clear, and concise. Maintain all the original information but improve the writing quality:\n\n${c}\n\nReturn only the rewritten content.`,
-  improve: (c) => `Improve the following SOP content by making it more detailed, actionable, and professional. Add any missing important details:\n\n${c}\n\nReturn only the improved content.`,
-  grammar: (c) => `Fix all grammar, spelling, and punctuation errors in the following text. Do not change the meaning or structure:\n\n${c}\n\nReturn only the corrected text.`,
-  summarize: (c) => `Write a concise professional summary of the following SOP content in 2-3 sentences:\n\n${c}\n\nReturn only the summary.`,
-  translate: (c, lang) => `Translate the following SOP content to ${lang ?? "Spanish"}. Maintain the professional business tone:\n\n${c}\n\nReturn only the translated content.`,
-  simplify: (c) => `Rewrite the following SOP content in simple, plain language that is easy for any employee to understand. Avoid jargon:\n\n${c}\n\nReturn only the simplified content.`,
+  rewrite:   (c) => `Rewrite the following proposal section to be more professional, clear, and persuasive. Maintain all the original information but improve the writing quality:\n\n${c}\n\nReturn only the rewritten content.`,
+  improve:   (c) => `Improve the following proposal section by making it more detailed, compelling, and professional. Add any missing important details:\n\n${c}\n\nReturn only the improved content.`,
+  grammar:   (c) => `Fix all grammar, spelling, and punctuation errors in the following text. Do not change the meaning or structure:\n\n${c}\n\nReturn only the corrected text.`,
+  summarize: (c) => `Write a concise professional summary of the following proposal content in 2-3 sentences:\n\n${c}\n\nReturn only the summary.`,
+  translate: (c, lang) => `Translate the following proposal content to ${lang ?? "French"}. Maintain the professional business tone:\n\n${c}\n\nReturn only the translated content.`,
+  simplify:  (c) => `Rewrite the following proposal content in simple, plain language that is easy for any reader to understand. Avoid jargon:\n\n${c}\n\nReturn only the simplified content.`,
 };
 
 export async function POST(req: NextRequest) {
