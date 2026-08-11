@@ -58,27 +58,21 @@ export function SettingsClient({ defaultTab }: { defaultTab?: string }) {
   const { data: session } = useSession();
   const userRole = (session?.user as { role?: string })?.role ?? "EMPLOYEE";
   const isAdmin  = userRole === "SUPER_ADMIN" || userRole === "ORG_ADMIN";
-  const resolvedTab = defaultTab === "admin" && isAdmin ? "admin" : (defaultTab ?? "ai");
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
-        <p className="text-muted-foreground text-sm mt-0.5">Manage your AI provider and profile.</p>
+        <p className="text-muted-foreground text-sm mt-0.5">Manage your profile and organization.</p>
       </div>
 
-      <Tabs defaultValue={resolvedTab}>
+      <Tabs defaultValue="profile">
         <TabsList>
-          <TabsTrigger value="ai"      className="gap-1.5"><Cpu       className="w-3.5 h-3.5" /> AI Provider</TabsTrigger>
-          <TabsTrigger value="profile" className="gap-1.5"><User      className="w-3.5 h-3.5" /> Profile</TabsTrigger>
+          <TabsTrigger value="profile" className="gap-1.5"><User className="w-3.5 h-3.5" /> Profile</TabsTrigger>
           {isAdmin && (
             <TabsTrigger value="admin" className="gap-1.5"><Building2 className="w-3.5 h-3.5" /> Organization</TabsTrigger>
           )}
         </TabsList>
-
-        <TabsContent value="ai" className="mt-6">
-          <AIProviderSettings />
-        </TabsContent>
 
         <TabsContent value="profile" className="mt-6">
           <ProfileSettings />

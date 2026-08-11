@@ -188,8 +188,8 @@ model AIGeneration {
 model AISettings {
   id          String   @id @default(cuid())
   userId      String   @unique
-  provider    String   @default("openai")
-  model       String   @default("gpt-4o-mini")
+  provider    String   @default("groq")
+  model       String   @default("llama-3.3-70b-versatile")
   apiKey      String?
   baseUrl     String?
   temperature Float    @default(0.7)

@@ -124,7 +124,7 @@ export function AppSidebarContent({
             className="rounded-md shrink-0"
           />
           <span className="text-sm font-medium tracking-tight text-[var(--sidebar-foreground)]">
-            Writer
+            Proposals
           </span>
         </motion.div>
         <SidebarPanelToggle />

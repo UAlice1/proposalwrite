@@ -1,5 +1,3 @@
-import { db } from "@/lib/db";
-
 export interface AIProvider {
   provider: string;
   model: string;
@@ -27,14 +25,11 @@ const DEFAULT_BASE_URLS: Record<string, string> = {
 };
 
 export async function getAISettings(userId: string): Promise<AIProvider> {
-  const settings = await db.aISettings.findUnique({ where: { userId } });
-  const provider = settings?.provider ?? "openai";
-  const model    = settings?.model && settings.model !== ""
-    ? settings.model
-    : DEFAULT_MODELS[provider] ?? "gpt-4o-mini";
-  const apiKey = settings?.apiKey ?? process.env.OPENAI_API_KEY ?? "";
-  const baseUrl = settings?.baseUrl ?? undefined;
-  return { provider, model, apiKey, baseUrl };
+  // Use env-configured Groq key directly — no per-user DB settings needed
+  const provider = process.env.AI_PROVIDER ?? "groq";
+  const model    = process.env.AI_MODEL     ?? DEFAULT_MODELS[provider] ?? "llama-3.3-70b-versatile";
+  const apiKey   = process.env.GROQ_API_KEY ?? process.env.OPENAI_API_KEY ?? "";
+  return { provider, model, apiKey };
 }
 
 export type ProposalType = "CONSULTING" | "CONSTRUCTION" | "CREATIVE" | "IT_SOFTWARE" | "FREELANCE" | "GENERAL";

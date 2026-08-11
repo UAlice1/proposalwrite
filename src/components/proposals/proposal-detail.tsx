@@ -90,13 +90,23 @@ export function ProposalDetail({ id }: { id: string }) {
     try {
       const res = await fetch(`/api/proposals/${id}/export?format=${format}`);
       if (!res.ok) throw new Error("Export failed");
-      const blob = await res.blob();
-      const url  = URL.createObjectURL(blob);
-      const a    = document.createElement("a");
-      a.href = url;
-      a.download = `${proposal?.title ?? "proposal"}.${format}`;
-      document.body.appendChild(a); a.click();
-      document.body.removeChild(a); URL.revokeObjectURL(url);
+
+      if (format === "pdf") {
+        // Open in new tab for browser print-to-PDF
+        const html = await res.text();
+        const blob = new Blob([html], { type: "text/html" });
+        const url  = URL.createObjectURL(blob);
+        const win  = window.open(url, "_blank");
+        setTimeout(() => { win?.print(); URL.revokeObjectURL(url); }, 800);
+      } else {
+        const blob = await res.blob();
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement("a");
+        a.href = url;
+        a.download = `${proposal?.title ?? "proposal"}.${format}`;
+        document.body.appendChild(a); a.click();
+        document.body.removeChild(a); URL.revokeObjectURL(url);
+      }
       ProposalToast.exported(format);
     } catch { toast.error("Export failed"); }
     finally { setExporting(null); }
@@ -275,8 +285,8 @@ export function ProposalDetail({ id }: { id: string }) {
               </div>
             ) : (
               proposal.sections.map((section) => (
-                <div key={section.id} className="bg-card border border-border rounded-xl overflow-hidden">
-                  <div className="flex items-center justify-between px-5 py-3 border-b border-border bg-muted/30">
+                <div key={section.id} className="bg-card rounded-xl overflow-hidden">
+                  <div className="flex items-center justify-between px-5 py-3 bg-muted/30">
                     <h3 className="text-sm font-semibold">{section.title}</h3>
                     <div className="flex items-center gap-1.5">
                       <Button

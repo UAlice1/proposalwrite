@@ -20,11 +20,11 @@ export default async function DebugPage() {
   let dbStatus = "✅ Connected";
   let dbError = "";
   let userCount = 0;
-  let sopCount = 0;
+  let proposalCount = 0;
 
   try {
-    userCount = await db.user.count();
-    sopCount  = await db.sOP.count();
+    userCount     = await db.user.count();
+    proposalCount = await db.proposal.count();
   } catch (e) {
     dbStatus = "❌ Failed";
     dbError  = e instanceof Error ? e.message : String(e);
@@ -132,8 +132,8 @@ export default async function DebugPage() {
                 <td className="px-4 py-2.5 font-mono text-xs">{userCount}</td>
               </tr>
               <tr>
-                <td className="px-4 py-2.5 font-medium text-muted-foreground">SOPs</td>
-                <td className="px-4 py-2.5 font-mono text-xs">{sopCount}</td>
+                <td className="px-4 py-2.5 font-medium text-muted-foreground">Proposals</td>
+                <td className="px-4 py-2.5 font-mono text-xs">{proposalCount}</td>
               </tr>
             </tbody>
           </table>
