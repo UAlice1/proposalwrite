@@ -1,55 +1,81 @@
-# PryroWriter
+# Pryro SOP — AI-Powered SOP Generator
 
-AI-powered business proposal generator built for African SMEs.
+A production-ready AI-powered platform for creating, managing, and exporting professional Standard Operating Procedures.
 
-## What it does
+## Features
 
-- Create a workspace for your company (name, logo, brand color)
-- Start a new proposal: select a proposal type (Consulting, Construction, Creative, IT/Software, Freelance), fill in your company info, client info, project details, budget, timeline, and tone preference
-- Click **Generate** — AI produces a complete, structured proposal: Cover Letter, Executive Summary, Problem & Solution, Scope of Work, Timeline, Pricing, Terms & Conditions, and Closing
-- Edit any section inline or regenerate individual sections with AI
-- Export as PDF or Word (.docx) styled with your company branding
+- **AI SOP Generation** — Describe a process in plain English; AI generates a complete professional SOP
+- **AI Writing Tools** — Improve, rewrite, fix grammar, summarize, simplify, translate any section
+- **Multi-Provider AI** — OpenAI, Anthropic, Groq, OpenRouter, DeepSeek, Mistral, custom OpenAI-compatible APIs
+- **Full SOP Editor** — Edit every section: purpose, scope, workflow, checklist, responsibilities, resources
+- **SOP Management** — Create, edit, duplicate, archive, favorite, delete, search, filter
+- **Export** — Export SOPs as professionally formatted HTML (printable as PDF)
+- **Comments** — Comment threads on each SOP
+- **Activity Log** — Full audit trail of all changes
+- **Dashboard** — Stats, recent SOPs, activity feed, AI usage tracking
+- **Command Palette** — ⌘K quick navigation and SOP search
+- **Dark / Light Mode** — System-aware theme switching
+- **Responsive** — Works on desktop and mobile
 
 ## Tech Stack
 
-- **Framework**: Next.js 16 (App Router, Turbopack)
-- **Database**: PostgreSQL via Neon (Prisma ORM)
-- **Auth**: NextAuth v5 (credentials + Google OAuth)
-- **AI**: Groq (llama-3.3-70b-versatile) via OpenAI-compatible API
-- **UI**: Tailwind CSS, shadcn/ui, Radix UI, Framer Motion
-- **Export**: Custom HTML/PDF generator + docx library
+- **Framework**: Next.js 16 (App Router, Server Components)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4
+- **UI Components**: Radix UI primitives
+- **Animations**: Framer Motion
+- **Auth**: NextAuth v5 (JWT strategy)
+- **Database**: PostgreSQL + Prisma ORM
+- **Forms**: React Hook Form + Zod
+- **State**: TanStack Query
 
-## Getting Started
+## Setup
 
-### 1. Clone and install
+### 1. Prerequisites
+
+- Node.js 18+
+- PostgreSQL 14+ running locally or remotely
+
+### 2. Install dependencies
 
 ```bash
-git clone https://github.com/UAlice1/proposalwrite.git
-cd proposalwrite
 npm install
 ```
 
-### 2. Set up environment variables
+### 3. Configure environment
 
-Create a `.env` file:
+Edit `.env`:
 
 ```env
-DATABASE_URL="your-neon-postgresql-url"
-NEXTAUTH_SECRET="your-random-secret"
+DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/pryro_sop"
 NEXTAUTH_URL="http://localhost:3000"
-GROQ_API_KEY="your-groq-api-key"
-AI_PROVIDER="groq"
-AI_MODEL="llama-3.3-70b-versatile"
+NEXTAUTH_SECRET="generate-a-32-char-secret-here"
 ```
 
-### 3. Set up the database
+Generate a secret:
+```bash
+openssl rand -base64 32
+```
+
+### 4. Create the database
+
+```sql
+CREATE DATABASE pryro_sop;
+```
+
+### 5. Run migrations
 
 ```bash
-npx prisma db push
+npx prisma migrate dev --name init
+```
+
+### 6. Generate Prisma client
+
+```bash
 npx prisma generate
 ```
 
-### 4. Run the development server
+### 7. Start development server
 
 ```bash
 npm run dev
@@ -57,21 +83,85 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-## Proposal Types
+## AI Configuration
 
-- **Consulting** — Strategic recommendations, methodology, ROI
-- **Construction** — Bid breakdown, materials, labour, compliance
-- **Creative** — Creative brief, concept, deliverables, revision policy
-- **IT / Software** — Technical architecture, milestones, SLAs, IP ownership
-- **Freelance** — Simple scope, rate, payment schedule
-- **General** — All-purpose business proposal
+After signing up, go to **Settings → AI Provider** to configure your AI keys:
 
-## Tone Options
+| Provider | Models |
+|----------|--------|
+| OpenAI | gpt-4o, gpt-4o-mini, gpt-4-turbo |
+| Anthropic | claude-3-5-sonnet, claude-3-haiku |
+| Groq | llama-3.3-70b, mixtral-8x7b |
+| OpenRouter | Any model |
+| DeepSeek | deepseek-chat, deepseek-reasoner |
+| Mistral | mistral-large, mistral-small |
+| Custom | Any OpenAI-compatible API |
 
-- **Professional** — Formal, polished, corporate
-- **Conversational** — Friendly, clear, approachable
-- **Executive** — Concise, high-level, ROI-focused
+API keys are stored encrypted in the database per user.
 
-## Built by
+## Project Structure
 
-Pryro Company — [pryro.com](https://pryro.com)
+```
+src/
+├── app/
+│   ├── (auth)/          # Login, register pages
+│   ├── (app)/           # Protected app pages
+│   │   ├── dashboard/   # Dashboard
+│   │   ├── sops/        # SOP list, new, detail
+│   │   └── settings/    # AI & profile settings
+│   └── api/             # API routes
+│       ├── ai/          # generate, improve, settings
+│       ├── auth/        # NextAuth + register
+│       ├── sops/        # CRUD + workflow/checklist/comments
+│       └── dashboard/   # Stats
+├── components/
+│   ├── ui/              # All UI primitives (Radix-based)
+│   ├── layout/          # Sidebar + header
+│   ├── sops/            # SOP editor, workflow, checklist, etc.
+│   ├── dashboard/       # Dashboard client
+│   ├── settings/        # Settings forms
+│   └── auth/            # Login/register forms
+├── lib/
+│   ├── db.ts            # Prisma client
+│   ├── auth.ts          # NextAuth config
+│   ├── ai.ts            # AI provider abstraction
+│   └── utils.ts         # Helpers + constants
+└── hooks/
+    └── use-debounce.ts
+```
+
+## Database Schema
+
+Key models:
+- **User** — Authentication, role, org membership
+- **SOP** — Main document with status, versioning
+- **SOPSection** — Document sections (purpose, scope, etc.)
+- **WorkflowStep** — Ordered process steps
+- **ChecklistItem** — Verification checklist
+- **Responsibility** — Roles & responsibilities
+- **Resource** — Required resources/tools
+- **Comment** — Threaded comments
+- **Activity** — Audit log
+- **AIGeneration** — AI usage tracking
+- **AISettings** — Per-user AI provider config
+- **ExportHistory** — Export tracking
+
+## Scripts
+
+```bash
+npm run dev          # Start development server
+npm run build        # Production build
+npm run start        # Start production server
+npm run lint         # Run ESLint
+npx prisma studio    # Open Prisma database GUI
+npx prisma migrate dev  # Run pending migrations
+```
+
+## Deployment
+
+The app is ready to deploy to any Node.js host (Vercel, Railway, Render, etc.).
+
+Set these environment variables in production:
+- `DATABASE_URL` — PostgreSQL connection string
+- `NEXTAUTH_URL` — Your production URL
+- `NEXTAUTH_SECRET` — A strong random secret (32+ chars)
