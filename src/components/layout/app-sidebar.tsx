@@ -58,7 +58,7 @@ function NavItem({
         "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
         isActive
           ? "bg-primary text-white font-medium"
-          : "text-[var(--sidebar-foreground)]/70 hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-foreground)]",
+          : "text-[var(--sidebar-foreground)]/70",
       )}
     >
       <Icon className="w-4 h-4 shrink-0" />
@@ -75,7 +75,7 @@ function SidebarPanelToggle() {
     <button
       onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
       aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-      className="flex items-center justify-center w-6 h-6 rounded-md text-[var(--sidebar-foreground)]/40 hover:text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] transition-colors"
+      className="flex items-center justify-center w-6 h-6 rounded-md text-[var(--sidebar-foreground)]/40 transition-colors"
     >
       <PanelLeft className="w-3.5 h-3.5" />
     </button>
@@ -134,7 +134,7 @@ export function AppSidebarContent({
       <div className="px-3 pt-3 pb-3 shrink-0">
         <button
           onClick={() => setCmdOpen(true)}
-          className="flex items-center gap-2 text-sm text-[var(--sidebar-foreground)]/50 hover:text-[var(--sidebar-foreground)] rounded-lg px-3 py-2 transition-colors hover:bg-[var(--sidebar-accent)] w-full"
+          className="flex items-center gap-2 text-sm text-[var(--sidebar-foreground)]/50 rounded-lg px-3 py-2 transition-colors w-full"
         >
           <Search className="w-3.5 h-3.5 shrink-0" />
           <span className="truncate">Search proposals...</span>
@@ -157,29 +157,29 @@ export function AppSidebarContent({
         ))}
       </nav>
 
-      {/* ── User footer — borderless, flat ───────────────────── */}
-      <div className="px-2 py-2 shrink-0">
+      {/* ── User footer — card style ─────────────────────────── */}
+      <div className="px-2 py-3 shrink-0">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className="w-full flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-[var(--sidebar-accent)] transition-colors text-left group"
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-[var(--sidebar-accent)] transition-all text-left group border border-[var(--sidebar-border)]"
               aria-label="User menu"
             >
-              <Avatar className="w-8 h-8 shrink-0">
+              <Avatar className="w-9 h-9 shrink-0 ring-2 ring-primary/30">
                 <AvatarImage src={user.image ?? ""} />
-                <AvatarFallback className="text-xs bg-primary text-primary-foreground font-medium">
+                <AvatarFallback className="text-sm bg-primary text-primary-foreground font-semibold">
                   {initials}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium truncate text-[var(--sidebar-foreground)]">
+                <p className="text-sm font-semibold truncate text-[var(--sidebar-foreground)]">
                   {user.name}
                 </p>
                 <p className="text-[11px] text-[var(--sidebar-foreground)]/50 truncate">
                   {user.email}
                 </p>
               </div>
-              <MoreVertical className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+              <MoreVertical className="w-3.5 h-3.5 text-[var(--sidebar-foreground)]/40 shrink-0" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent side="top" align="start" className="w-[--radix-popper-anchor-width] mb-1">
@@ -230,7 +230,7 @@ function CollapsedSidebar({ user }: { user: NextAuthUser }) {
       <button
         onClick={() => setSidebarCollapsed(false)}
         aria-label="Expand sidebar"
-        className="flex items-center justify-center w-9 h-9 rounded-lg hover:bg-[var(--sidebar-accent)] transition-colors mb-1"
+        className="flex items-center justify-center w-9 h-9 rounded-lg transition-colors mb-1"
       >
         <Image
           src="/images/pryro.png"
@@ -253,7 +253,7 @@ function CollapsedSidebar({ user }: { user: NextAuthUser }) {
               "flex items-center justify-center w-9 h-9 rounded-lg transition-colors",
               isActive
                 ? "bg-[var(--sidebar-accent)] text-[var(--sidebar-foreground)]"
-                : "text-[var(--sidebar-foreground)]/60 hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-foreground)]",
+                : "text-[var(--sidebar-foreground)]/60",
             )}
           >
             <Icon className="w-4 h-4" />
@@ -269,7 +269,7 @@ function CollapsedSidebar({ user }: { user: NextAuthUser }) {
         <DropdownMenuTrigger asChild>
           <button
             title={`${user.name} — ${user.email}`}
-            className="flex items-center justify-center w-9 h-9 rounded-lg hover:bg-[var(--sidebar-accent)] transition-colors mb-1"
+            className="flex items-center justify-center w-9 h-9 rounded-lg transition-colors mb-1"
             aria-label="User menu"
           >
             <Avatar className="w-7 h-7">

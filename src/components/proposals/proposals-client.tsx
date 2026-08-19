@@ -137,7 +137,7 @@ export function ProposalsClient() {
         <div className="relative flex-1 min-w-0">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input value={search} onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
-            placeholder="Search proposals…" className="pl-9 h-9" />
+            className="pl-9 h-9" />
           {search && (
             <button className="absolute right-3 top-1/2 -translate-y-1/2" onClick={() => setSearch("")}>
               <X className="w-3.5 h-3.5 text-muted-foreground hover:text-foreground" />
@@ -199,7 +199,7 @@ export function ProposalsClient() {
           <div className="space-y-2">
             {proposals.map((proposal, i) => (
               <motion.div key={proposal.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ delay: i * 0.03 }}>
-                <div className="flex items-center gap-4 p-4 bg-card border border-border rounded-xl hover:shadow-sm transition-all group">
+                <div className="flex items-center gap-4 p-4 bg-card border border-border rounded-xl transition-all group">
                   <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
                     <FileText className="w-4 h-4 text-muted-foreground" />
                   </div>

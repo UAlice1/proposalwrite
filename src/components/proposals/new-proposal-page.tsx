@@ -175,7 +175,7 @@ export function NewProposalPage() {
               {/* Proposal Title */}
               <div className="space-y-1.5">
                 <Label htmlFor="title" className="text-sm font-medium">Proposal Title</Label>
-                <Input id="title" placeholder="e.g. Web Development Proposal for Acme Corp" {...register("title")}
+                <Input id="title" {...register("title")}
                   className={errors.title ? "border-destructive" : ""} />
                 {errors.title && <p className="text-xs text-destructive">{errors.title.message}</p>}
               </div>
@@ -184,13 +184,13 @@ export function NewProposalPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label htmlFor="yourCompanyName" className="text-sm font-medium">Your Company</Label>
-                  <Input id="yourCompanyName" placeholder="e.g. TechSolve Africa" {...register("yourCompanyName")}
+                  <Input id="yourCompanyName" {...register("yourCompanyName")}
                     className={errors.yourCompanyName ? "border-destructive" : ""} />
                   {errors.yourCompanyName && <p className="text-xs text-destructive">{errors.yourCompanyName.message}</p>}
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="clientName" className="text-sm font-medium">Client / Recipient</Label>
-                  <Input id="clientName" placeholder="e.g. Acme Corp" {...register("clientName")}
+                  <Input id="clientName" {...register("clientName")}
                     className={errors.clientName ? "border-destructive" : ""} />
                   {errors.clientName && <p className="text-xs text-destructive">{errors.clientName.message}</p>}
                 </div>
@@ -226,7 +226,7 @@ export function NewProposalPage() {
               <div className="space-y-1.5">
                 <Label htmlFor="projectDetails" className="text-sm font-medium">Project / Service Details</Label>
                 <div className="relative">
-                  <Textarea id="projectDetails" rows={5} placeholder="Describe the project, services, client needs, and what you're proposing..." {...register("projectDetails")}
+                  <Textarea id="projectDetails" rows={5} {...register("projectDetails")}
                     className={`resize-none pb-7 ${errors.projectDetails ? "border-destructive" : ""}`} />
                   <span className="absolute bottom-2 right-3 text-[11px] text-muted-foreground tabular-nums">
                     {detailsValue.length} chars
@@ -239,18 +239,18 @@ export function NewProposalPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label htmlFor="budget" className="text-sm font-medium">Budget (optional)</Label>
-                  <Input id="budget" placeholder="e.g. $5,000 – $10,000" {...register("budget")} />
+                  <Input id="budget" {...register("budget")} />
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="timeline" className="text-sm font-medium">Timeline (optional)</Label>
-                  <Input id="timeline" placeholder="e.g. 6 weeks" {...register("timeline")} />
+                  <Input id="timeline" {...register("timeline")} />
                 </div>
               </div>
 
               {/* Client Industry */}
               <div className="space-y-1.5">
                 <Label htmlFor="clientIndustry" className="text-sm font-medium">Client Industry (optional)</Label>
-                <Input id="clientIndustry" placeholder="e.g. Healthcare, Retail, Finance" {...register("clientIndustry")} />
+                <Input id="clientIndustry" {...register("clientIndustry")} />
               </div>
             </div>
           </div>
@@ -258,7 +258,7 @@ export function NewProposalPage() {
           {/* Actions */}
           <div className="flex items-center justify-end gap-3 mt-5">
             <Button type="button" variant="outline" onClick={onSaveDraft} disabled={savingDraft || loading} className="gap-2">
-              {savingDraft ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
+              {savingDraft && <Loader2 className="w-4 h-4 animate-spin" />}
               Save Draft
             </Button>
             <Button type="button" onClick={onGenerate} disabled={loading || savingDraft} className="gap-2">

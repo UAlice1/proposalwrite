@@ -191,7 +191,7 @@ export function ProposalDetail({ id }: { id: string }) {
       {/* Top bar */}
       <div className="flex items-center justify-between px-3 py-3 md:px-6 border-b border-border shrink-0">
         <button onClick={() => router.push("/proposals")}
-          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+          className="flex items-center gap-2 text-sm text-muted-foreground transition-colors">
           <ArrowLeft className="w-4 h-4" /> Back to Proposals
         </button>
         <div className="flex items-center gap-2">

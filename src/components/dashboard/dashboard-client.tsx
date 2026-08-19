@@ -76,6 +76,7 @@ export function DashboardClient({ userName }: { userName: string }) {
       sub:   stats?.canViewAll ? "org-wide" : "your proposals",
       icon:  FileText,
       color: "text-blue-500",
+      badge: { label: "All", color: "bg-blue-500 text-white" },
       href:  "/proposals",
     },
     {
@@ -84,6 +85,7 @@ export function DashboardClient({ userName }: { userName: string }) {
       sub:   "in progress",
       icon:  Clock,
       color: "text-yellow-500",
+      badge: { label: "Draft", color: "bg-yellow-400 text-yellow-900" },
       href:  "/proposals?status=DRAFT",
     },
     {
@@ -92,6 +94,7 @@ export function DashboardClient({ userName }: { userName: string }) {
       sub:   "awaiting response",
       icon:  GitMerge,
       color: "text-violet-500",
+      badge: { label: "Sent", color: "bg-violet-500 text-white" },
       href:  "/proposals?status=SENT",
     },
     {
@@ -100,6 +103,7 @@ export function DashboardClient({ userName }: { userName: string }) {
       sub:   "won proposals",
       icon:  CheckCircle,
       color: "text-green-500",
+      badge: { label: "Won", color: "bg-green-500 text-white" },
       href:  "/proposals?status=ACCEPTED",
     },
   ];
@@ -131,13 +135,18 @@ export function DashboardClient({ userName }: { userName: string }) {
         {statCards.map((card, i) => (
           <motion.div key={card.title} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}>
             <Link href={card.href}>
-              <Card className="hover:border-primary/40 hover:shadow-sm transition-all cursor-pointer">
-                <CardContent className="p-4">
-                  <p className="text-sm text-muted-foreground mb-3">{card.title}</p>
-                  {isLoading ? <Skeleton className="h-8 w-16" /> : (
+              <Card className="transition-all cursor-pointer">
+                <CardContent className="px-3 py-1.5">
+                  <div className="flex items-center justify-between mb-0.5">
+                    <p className="text-[11px] text-muted-foreground">{card.title}</p>
+                    <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${card.badge.color}`}>
+                      {card.badge.label}
+                    </span>
+                  </div>
+                  {isLoading ? <Skeleton className="h-5 w-8" /> : (
                     <>
-                      <p className="text-3xl font-bold">{card.value}</p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">{card.sub}</p>
+                      <p className="text-base font-bold leading-none">{card.value}</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">{card.sub}</p>
                     </>
                   )}
                 </CardContent>
@@ -173,9 +182,9 @@ export function DashboardClient({ userName }: { userName: string }) {
 function QuickAction({ icon, title, desc, href }: { icon: React.ReactNode; title: string; desc: string; href: string }) {
   return (
     <Link href={href}>
-      <div className="flex items-center gap-3 p-3 bg-card border border-border rounded-xl hover:border-primary/40 hover:shadow-sm transition-all cursor-pointer group">
+      <div className="flex items-center gap-3 p-3 bg-card border border-border rounded-xl hover:shadow-sm transition-all cursor-pointer group">
         <div className="min-w-0">
-          <p className="text-sm font-medium group-hover:text-primary transition-colors">{title}</p>
+          <p className="text-sm font-medium">{title}</p>
           <p className="text-xs text-muted-foreground truncate">{desc}</p>
         </div>
         <ArrowRight className="w-3.5 h-3.5 text-muted-foreground ml-auto shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -214,7 +223,7 @@ function RecentProposalsCard({ proposals, loading, canCreate }: { proposals: Rec
         ) : (
           <div className="divide-y divide-border max-h-[280px] overflow-y-auto">
             {proposals.map((p) => (
-              <Link key={p.id} href={`/proposals/${p.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-muted/50 transition-colors">
+              <Link key={p.id} href={`/proposals/${p.id}`} className="flex items-center gap-3 px-4 py-3 transition-colors">
                 <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
                   <FileText className="w-4 h-4 text-muted-foreground" />
                 </div>
@@ -259,7 +268,7 @@ function ActivityCard({ activity, loading, canViewAll }: { activity: ActivityIte
                 </Avatar>
                 <div className="flex-1 min-w-0">
                   {act.proposal ? (
-                    <Link href={`/proposals/${act.proposal.id}`} className="text-xs leading-snug hover:text-primary transition-colors line-clamp-2">
+                    <Link href={`/proposals/${act.proposal.id}`} className="text-xs leading-snug transition-colors line-clamp-2">
                       {act.description ?? act.action}
                     </Link>
                   ) : (

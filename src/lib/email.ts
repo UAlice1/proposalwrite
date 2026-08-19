@@ -1,12 +1,19 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
-const APP_URL    = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
-const FROM_EMAIL = process.env.EMAIL_FROM ?? "PryroWriter <noreply@pryrowriter.com>";
+const APP_URL = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
 
-function getResend() {
-  const key = process.env.RESEND_API_KEY;
-  if (!key) throw new Error("RESEND_API_KEY is not set. Add it to your .env file.");
-  return new Resend(key);
+function createTransport() {
+  const user = process.env.GMAIL_USER;
+  const pass = process.env.GMAIL_APP_PASSWORD;
+
+  if (!user || !pass) {
+    throw new Error("GMAIL_USER or GMAIL_APP_PASSWORD is not set in environment variables.");
+  }
+
+  return nodemailer.createTransport({
+    service: "gmail",
+    auth: { user, pass },
+  });
 }
 
 export async function sendPasswordResetEmail(
@@ -16,6 +23,7 @@ export async function sendPasswordResetEmail(
 ) {
   const resetUrl = `${APP_URL}/reset-password/${token}`;
   const name     = userName ?? "there";
+  const from     = `PryroWriter <${process.env.GMAIL_USER}>`;
 
   const html = `
 <!DOCTYPE html>
@@ -68,7 +76,7 @@ export async function sendPasswordResetEmail(
           <tr>
             <td style="padding:16px 32px;background:#f9fafb;border-top:1px solid #f3f4f6;">
               <p style="margin:0;font-size:11px;color:#9ca3af;text-align:center;">
-                © ${new Date().getFullYear()} PryroWriter · You're receiving this because a password reset was requested.
+                &copy; ${new Date().getFullYear()} PryroWriter &middot; You're receiving this because a password reset was requested.
               </p>
             </td>
           </tr>
@@ -79,12 +87,12 @@ export async function sendPasswordResetEmail(
 </body>
 </html>`;
 
-  const { error } = await getResend().emails.send({
-    from:    FROM_EMAIL,
-    to:      [to],
+  const transporter = createTransport();
+
+  await transporter.sendMail({
+    from,
+    to,
     subject: "Reset your PryroWriter password",
     html,
   });
-
-  if (error) throw new Error(error.message);
 }
