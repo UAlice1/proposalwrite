@@ -295,7 +295,7 @@ const Composer: FC = () => (
         <ComposerAttachments />
         <ComposerPrimitive.Input
           placeholder="Message Pryro..."
-          className="aui-composer-input caret-foreground placeholder:text-muted-foreground max-h-[200px] min-h-[44px] w-full resize-none bg-transparent px-2 py-1.5 text-[15px] leading-relaxed outline-none text-foreground"
+          className="aui-composer-input caret-foreground placeholder:text-[#999999] max-h-[200px] min-h-[44px] w-full resize-none bg-transparent px-2 py-1.5 text-[15px] leading-relaxed outline-none text-foreground"
           rows={1}
           autoFocus
           enterKeyHint="send"
@@ -566,7 +566,7 @@ const EditComposer: FC = () => (
       )}
     >
       <ComposerPrimitive.Input
-        className="text-foreground min-h-14 w-full resize-none bg-transparent px-4 pt-3 pb-1 text-[15px] outline-none placeholder:text-muted-foreground"
+        className="text-foreground min-h-14 w-full resize-none bg-transparent px-4 pt-3 pb-1 text-[15px] outline-none placeholder:text-[#999999]"
         autoFocus
       />
       <div className="mx-3 mb-3 flex items-center gap-1.5 self-end">

@@ -293,7 +293,7 @@ export function InviteStaffDialog({
                   placeholder={emails.length === 0 ? "name@company.com, another@company.com…" : "Add more…"}
                   className={cn(
                     "flex-1 min-w-[180px] bg-transparent text-sm outline-none",
-                    "text-foreground placeholder:text-muted-foreground",
+                    "text-foreground placeholder:text-[#999999]",
                   )}
                   aria-label="Email address input"
                 />

@@ -95,6 +95,10 @@
   --sidebar-border:             #E5E7EB;
   --sidebar-ring:               #0D6CFE;
 
+  /* Placeholder color — distinctly lighter than body text */
+  --placeholder-color: #999999;
+  --placeholder-color-focus: #CCCCCC;
+
   /* Custom shadows */
   --shadow-card:    0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
   --shadow-card-lg: 0 4px 6px rgba(0, 0, 0, 0.10), 0 2px 4px rgba(0, 0, 0, 0.06);
@@ -148,6 +152,10 @@
   --sidebar-border:             #334155;
   --sidebar-ring:               #3B82F6;
 
+  /* Placeholder color — muted against dark surfaces */
+  --placeholder-color: #999999;
+  --placeholder-color-focus: #CCCCCC;
+
   --shadow-card:    0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
   --shadow-card-lg: 0 4px 6px rgba(0, 0, 0, 0.35), 0 2px 4px rgba(0, 0, 0, 0.25);
   --shadow-card-xl: 0 10px 15px rgba(0, 0, 0, 0.4), 0 4px 6px rgba(0, 0, 0, 0.3);
@@ -166,6 +174,27 @@
     @apply font-sans;
     scroll-behavior: smooth;
   }
+
+  /* ── Global placeholder styling ───────────────────────────────────
+     Applies to all inputs, textareas, and contenteditable across the
+     app. Uses --placeholder-color (light gray) so placeholders are
+     clearly distinct from real typed content in both modes.
+  ─────────────────────────────────────────────────────────────────── */
+  input::placeholder,
+  textarea::placeholder,
+  [contenteditable]::placeholder {
+    color: #999999;
+    opacity: 1;
+  }
+
+  /* Fade placeholder slightly on focus so it doesn't compete with typing */
+  input:focus::placeholder,
+  textarea:focus::placeholder,
+  [contenteditable]:focus::placeholder {
+    color: #CCCCCC;
+    opacity: 1;
+  }
+
   /* Override browser autofill sky-blue background */
   input:-webkit-autofill,
   input:-webkit-autofill:hover,

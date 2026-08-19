@@ -104,7 +104,7 @@ export function SOPTags({ sopId }: { sopId: string }) {
             onKeyDown={handleKey}
             onFocus={() => setShowSuggestions(true)}
             placeholder={tags.length === 0 ? "Add tags (press Enter or comma)..." : ""}
-            className="flex-1 min-w-24 bg-transparent outline-none text-sm placeholder:text-muted-foreground"
+            className="flex-1 min-w-24 bg-transparent outline-none text-sm placeholder:text-[#999999]"
           />
         </div>
 

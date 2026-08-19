@@ -88,7 +88,7 @@ export function LoginForm() {
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password" className="text-xs font-medium">Password</Label>
                   <Button asChild variant="link" size="sm" className="h-auto p-0 text-xs">
-                    <Link href="#">Forgot password?</Link>
+                    <Link href="/forgot-password">Forgot password?</Link>
                   </Button>
                 </div>
                 <div className="relative">
