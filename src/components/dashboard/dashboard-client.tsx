@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -66,8 +67,13 @@ export function DashboardClient({ userName }: { userName: string }) {
     refetchOnWindowFocus: true,
   });
 
-  const role       = stats?.role ?? "EMPLOYEE";
-  const canCreate  = ["SUPER_ADMIN", "ORG_ADMIN", "MANAGER"].includes(role);
+  const role      = stats?.role ?? "EMPLOYEE";
+  const canCreate = ["SUPER_ADMIN", "ORG_ADMIN", "MANAGER"].includes(role);
+  const [greeting, setGreeting] = useState("day");
+
+  useEffect(() => {
+    setGreeting(getGreeting());
+  }, []);
 
   const statCards = [
     {
@@ -114,7 +120,7 @@ export function DashboardClient({ userName }: { userName: string }) {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">
-            Good {getGreeting()}, {userName.split(" ")[0]}
+            Good {greeting}, {userName.split(" ")[0]}
           </h1>
           <p className="text-muted-foreground text-sm mt-0.5">
             Here&apos;s your proposal overview

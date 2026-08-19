@@ -121,6 +121,7 @@ export function AppSidebarContent({
             alt="Pryro logo"
             width={56}
             height={56}
+            style={{ width: "56px", height: "auto" }}
             className="rounded-md shrink-0"
           />
           <span className="text-sm font-medium tracking-tight text-[var(--sidebar-foreground)]">
@@ -237,6 +238,7 @@ function CollapsedSidebar({ user }: { user: NextAuthUser }) {
           alt="Pryro logo"
           width={32}
           height={32}
+          style={{ width: "32px", height: "auto" }}
           className="rounded-md"
         />
       </button>

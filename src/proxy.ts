@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-const AUTH_API_PREFIX  = "/api/auth";
 const ADMIN_API_PREFIX = "/api/admin";
-const PUBLIC_PAGES     = ["/login", "/register"];
+
+const PUBLIC_PAGES = [
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/reset-password",
+];
 
 const ORG_EXEMPT_API = [
   "/api/auth",
@@ -28,22 +33,21 @@ const ORG_EXEMPT_API = [
 export default async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Always pass NextAuth endpoints through
-  if (pathname.startsWith(AUTH_API_PREFIX)) {
+  // ── Always allow auth-related paths ─────────────────────────────
+  // Never block NextAuth internals or password reset endpoints
+  if (pathname.startsWith("/api/auth")) {
     return NextResponse.next();
   }
 
-  const secret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET ?? "";
+  // ── Resolve token ─────────────────────────────────────────────────
+  const secret   = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET ?? "";
+  const isSecure = req.url.startsWith("https://");
 
   let token = null;
   try {
-    const isSecure = req.url.startsWith("https://");
-    const cookieName = isSecure ? "__Secure-authjs.session-token" : "authjs.session-token";
-    token = await getToken({ req, secret, cookieName, salt: cookieName });
-    if (!token) {
-      token = await getToken({ req, secret });
-    }
+    token = await getToken({ req, secret, secureCookie: isSecure });
   } catch {
+    // If token resolution fails, treat as unauthenticated
     token = null;
   }
 
@@ -51,15 +55,16 @@ export default async function proxy(req: NextRequest) {
   const role  = (token?.role  as string | undefined) ?? "EMPLOYEE";
   const orgId = (token?.organizationId as string | undefined) ?? null;
 
-  // Auth pages — redirect logged-in users to proposals
-  if (PUBLIC_PAGES.includes(pathname)) {
+  // ── Public pages ──────────────────────────────────────────────────
+  // Redirect authenticated users away from login/register
+  if (PUBLIC_PAGES.some((p) => pathname === p || pathname.startsWith(p + "/"))) {
     if (isAuthenticated) {
       return NextResponse.redirect(new URL("/proposals", req.url));
     }
     return NextResponse.next();
   }
 
-  // Require authentication
+  // ── Require auth ──────────────────────────────────────────────────
   if (!isAuthenticated) {
     if (pathname.startsWith("/api/")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -69,14 +74,14 @@ export default async function proxy(req: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Admin API guard
+  // ── Admin API guard ───────────────────────────────────────────────
   if (pathname.startsWith(ADMIN_API_PREFIX)) {
     if (role !== "SUPER_ADMIN" && role !== "ORG_ADMIN") {
       return NextResponse.json({ error: "Admin access required" }, { status: 403 });
     }
   }
 
-  // Org isolation (relaxed — all proposal routes exempt)
+  // ── Org isolation ─────────────────────────────────────────────────
   const skipOrgCheck = ORG_EXEMPT_API.some((p) => pathname.startsWith(p));
   if (
     pathname.startsWith("/api/") &&
