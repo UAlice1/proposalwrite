@@ -56,21 +56,55 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     async signIn({ user, account, profile }) {
       if (account?.provider === "google" && user.email) {
-        const existing = await db.user.findUnique({
-          where:  { email: user.email },
-          select: { id: true, role: true, emailVerified: true },
-        }).catch(() => null);
+        // Use upsert to atomically handle both new and returning Google users.
+        //
+        // WHY: The PrismaAdapter creates the user record AFTER signIn returns
+        // true, so findUnique() + update() has a race condition on first login —
+        // the user row doesn't exist yet when update() fires, causing it to fail
+        // silently. upsert() removes the race entirely: if the row exists it
+        // updates it; if it doesn't exist yet it creates it with the correct
+        // role and image in one atomic operation.
+        try {
+          await db.user.upsert({
+            where: { email: user.email },
+            // PrismaAdapter will also try to create the user — that's fine,
+            // because our upsert runs first and sets the fields we care about.
+            // If the adapter's create runs after, it won't overwrite emailVerified
+            // or role because those fields aren't in the adapter's create payload.
+            create: {
+              email:         user.email,
+              name:          user.name          ?? null,
+              image:         (profile?.picture as string) ?? user.image ?? null,
+              emailVerified: new Date(),
+              role:          "MANAGER",
+            },
+            update: {
+              emailVerified: new Date(),
+              image:         (profile?.picture as string) ?? user.image ?? undefined,
+              name:          user.name ?? undefined,
+              // Only promote to MANAGER if they somehow ended up as EMPLOYEE
+              // (e.g. created via invite). Never demote an existing ADMIN.
+              role: undefined, // handled below via conditional spread
+            },
+          });
 
-        const isNewUser = !existing?.emailVerified;
-        await db.user.update({
-          where: { email: user.email },
-          data:  {
-            emailVerified: new Date(),
-            image: (profile?.picture as string) ?? user.image ?? undefined,
-            name:  user.name ?? undefined,
-            ...(isNewUser || existing?.role === "EMPLOYEE" ? { role: "MANAGER" } : {}),
-          },
-        }).catch(() => null);
+          // Promote EMPLOYEE → MANAGER on Google sign-in but never demote admins.
+          // We do this as a separate step so we can read the current role first.
+          const current = await db.user.findUnique({
+            where:  { email: user.email },
+            select: { role: true },
+          });
+          if (current?.role === "EMPLOYEE") {
+            await db.user.update({
+              where: { email: user.email },
+              data:  { role: "MANAGER" },
+            });
+          }
+        } catch (err) {
+          // Log the real error instead of swallowing it silently
+          console.error("[auth] Google signIn upsert failed:", err);
+          // Still return true — the user can log in even if role assignment fails
+        }
       }
       return true;
     },
