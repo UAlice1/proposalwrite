@@ -3,6 +3,10 @@ import { getToken } from "next-auth/jwt";
 
 const PUBLIC_PAGES = ["/login", "/register", "/forgot-password", "/reset-password"];
 
+export const config = {
+  matcher: ["/((?!_next/static|_next/image|favicon\\.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
+};
+
 export default async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
@@ -44,6 +48,4 @@ export default async function proxy(req: NextRequest) {
   return NextResponse.next();
 }
 
-export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon\\.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
-};
+
