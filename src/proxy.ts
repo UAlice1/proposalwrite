@@ -41,7 +41,10 @@ export default async function proxy(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const url = new URL("/login", req.url);
-    url.searchParams.set("callbackUrl", pathname);
+    // Only set callbackUrl for non-auth pages to avoid redirect loops
+    if (!PUBLIC_PAGES.some((p) => pathname.startsWith(p))) {
+      url.searchParams.set("callbackUrl", pathname);
+    }
     return NextResponse.redirect(url);
   }
 
