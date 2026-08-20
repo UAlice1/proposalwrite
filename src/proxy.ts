@@ -1,105 +1,49 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-const ADMIN_API_PREFIX = "/api/admin";
-
-const PUBLIC_PAGES = [
-  "/login",
-  "/register",
-  "/forgot-password",
-  "/reset-password",
-];
-
-const ORG_EXEMPT_API = [
-  "/api/auth",
-  "/api/register",
-  "/api/setup",
-  "/api/assistant",
-  "/api/chat",
-  "/api/ai",
-  "/api/proposals",
-  "/api/generate-proposal",
-  "/api/dashboard",
-  "/api/tags",
-  "/api/admin/org",
-  "/api/profile",
-  "/api/user",
-  "/api/ai/settings",
-  "/api/categories",
-  "/api/departments",
-  "/api/notifications",
-];
+const PUBLIC_PAGES = ["/login", "/register", "/forgot-password", "/reset-password"];
 
 export default async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // ── Always allow auth-related paths ─────────────────────────────
-  // Never block NextAuth internals or password reset endpoints
-  if (pathname.startsWith("/api/auth")) {
+  // Never touch auth routes
+  if (pathname.startsWith("/api/auth")) return NextResponse.next();
+
+  // Allow static assets
+  if (pathname.startsWith("/_next") || pathname.startsWith("/images") || pathname.match(/\.(ico|png|svg|jpg|jpeg|gif|webp|css|js)$/)) {
     return NextResponse.next();
   }
 
-  // ── Resolve token ─────────────────────────────────────────────────
-  const secret   = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET ?? "";
-  const isSecure = req.url.startsWith("https://");
+  const secret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET ?? "";
 
   let token = null;
   try {
-    token = await getToken({ req, secret, secureCookie: isSecure });
+    token = await getToken({ req, secret });
   } catch {
-    // If token resolution fails, treat as unauthenticated
     token = null;
   }
 
   const isAuthenticated = !!token;
-  const role  = (token?.role  as string | undefined) ?? "EMPLOYEE";
-  const orgId = (token?.organizationId as string | undefined) ?? null;
 
-  // ── Public pages ──────────────────────────────────────────────────
-  // Redirect authenticated users away from login/register
-  if (PUBLIC_PAGES.some((p) => pathname === p || pathname.startsWith(p + "/"))) {
-    if (isAuthenticated) {
-      return NextResponse.redirect(new URL("/proposals", req.url));
-    }
+  // Redirect authenticated users away from public pages
+  if (PUBLIC_PAGES.some((p) => pathname.startsWith(p))) {
+    if (isAuthenticated) return NextResponse.redirect(new URL("/proposals", req.url));
     return NextResponse.next();
   }
 
-  // ── Require auth ──────────────────────────────────────────────────
+  // Require auth everywhere else
   if (!isAuthenticated) {
     if (pathname.startsWith("/api/")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const loginUrl = new URL("/login", req.url);
-    loginUrl.searchParams.set("callbackUrl", pathname);
-    return NextResponse.redirect(loginUrl);
-  }
-
-  // ── Admin API guard ───────────────────────────────────────────────
-  if (pathname.startsWith(ADMIN_API_PREFIX)) {
-    if (role !== "SUPER_ADMIN" && role !== "ORG_ADMIN") {
-      return NextResponse.json({ error: "Admin access required" }, { status: 403 });
-    }
-  }
-
-  // ── Org isolation ─────────────────────────────────────────────────
-  const skipOrgCheck = ORG_EXEMPT_API.some((p) => pathname.startsWith(p));
-  if (
-    pathname.startsWith("/api/") &&
-    role !== "SUPER_ADMIN" &&
-    !orgId &&
-    !skipOrgCheck
-  ) {
-    return NextResponse.json(
-      { error: "You must belong to an organization to access this resource" },
-      { status: 403 }
-    );
+    const url = new URL("/login", req.url);
+    url.searchParams.set("callbackUrl", pathname);
+    return NextResponse.redirect(url);
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon\\.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon\\.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
 };
