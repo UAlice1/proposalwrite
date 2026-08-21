@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import {
   ArrowLeft, Star, FileDown, ChevronDown, Loader2,
-  MoreHorizontal, Trash2, FileText, Activity, Sparkles,
+  MoreHorizontal, Trash2,
   Calendar, RefreshCw, Plus,
 } from "lucide-react";
 import { STATUS_LABELS, STATUS_COLORS, PROPOSAL_TYPE_LABELS, TONE_LABELS, formatDateTime } from "@/lib/utils";
@@ -59,8 +59,8 @@ interface ProposalData {
 }
 
 const TABS = [
-  { id: "sections", label: "Sections",  icon: FileText },
-  { id: "activity", label: "Activity",  icon: Activity },
+  { id: "sections", label: "Sections" },
+  { id: "activity", label: "Activity" },
 ];
 
 export function ProposalDetail({ id }: { id: string }) {
@@ -221,11 +221,11 @@ export function ProposalDetail({ id }: { id: string }) {
       {/* Title block */}
       <div className="px-3 pt-4 pb-2 md:px-6 shrink-0">
         <div className="flex items-center gap-2 mb-2 flex-wrap">
-          {proposal.isAIGenerated && <Badge variant="secondary" className="text-xs">AI Generated</Badge>}
-          <Badge variant="outline" className="text-xs">
+          {proposal.isAIGenerated && <Badge className="text-xs bg-blue-600 text-white">AI Generated</Badge>}
+          <Badge className="text-xs bg-blue-600 text-white">
             {PROPOSAL_TYPE_LABELS[proposal.proposalType] ?? proposal.proposalType}
           </Badge>
-          <Badge variant="outline" className="text-xs">
+          <Badge className="text-xs bg-blue-600 text-white">
             {TONE_LABELS[proposal.tonePreference] ?? proposal.tonePreference}
           </Badge>
         </div>
@@ -253,14 +253,13 @@ export function ProposalDetail({ id }: { id: string }) {
       {/* Tab bar */}
       <div className="px-3 md:px-6 border-b border-border shrink-0">
         <div className="flex gap-0">
-          {TABS.map(({ id: tid, label, icon: Icon }) => (
+          {TABS.map(({ id: tid, label }) => (
             <button key={tid} onClick={() => setActiveTab(tid)}
               className={cn("flex items-center gap-1.5 px-4 py-2.5 text-sm border-b-2 transition-colors",
                 activeTab === tid
                   ? "border-primary text-foreground font-medium"
                   : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
               )}>
-              <Icon className="w-3.5 h-3.5" />
               {label}
             </button>
           ))}
@@ -275,9 +274,6 @@ export function ProposalDetail({ id }: { id: string }) {
           <div className="space-y-4 max-w-4xl">
             {proposal.sections.length === 0 ? (
               <div className="flex flex-col items-center gap-3 py-16">
-                <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center">
-                  <FileText className="w-6 h-6 text-muted-foreground" />
-                </div>
                 <p className="text-sm font-medium">No sections yet</p>
                 <p className="text-xs text-muted-foreground text-center">
                   Go back and generate this proposal with AI, or the sections will appear here.
@@ -345,9 +341,6 @@ export function ProposalDetail({ id }: { id: string }) {
             ) : (
               proposal.activities.map((act) => (
                 <div key={act.id} className="flex items-start gap-3 p-3 bg-card border border-border rounded-xl">
-                  <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center shrink-0 mt-0.5">
-                    <Sparkles className="w-3.5 h-3.5 text-muted-foreground" />
-                  </div>
                   <div>
                     <p className="text-sm">{act.description ?? act.action}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">{formatDateTime(act.createdAt)}</p>

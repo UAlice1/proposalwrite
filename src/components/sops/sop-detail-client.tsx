@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  ArrowLeft, Star, Copy, Archive, Trash2, Sparkles,
+  ArrowLeft, Star, Copy, Archive, Trash2,
   FileText, CheckSquare, Users, BookOpen, Activity,
   GitMerge, History, Lightbulb, MessageSquareMore, Printer,
   FileDown, FileType, Globe, ChevronDown, Loader2,
@@ -197,7 +197,7 @@ export function SOPDetailClient({ id }: { id: string }) {
         </Button>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            {sop.isAIGenerated && <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 text-xs">AI Generated</Badge>}
+            {sop.isAIGenerated && <Badge className="bg-blue-600 text-white text-xs">AI Generated</Badge>}
             <Badge className={`text-xs ${STATUS_COLORS[sop.status]}`}>{STATUS_LABELS[sop.status]}</Badge>
             {sop.isFavorite && <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />}
           </div>

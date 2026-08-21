@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { auth } from "@/lib/auth";
 
 const PUBLIC_PAGES = ["/login", "/register", "/forgot-password", "/reset-password"];
 
@@ -14,20 +14,18 @@ export default async function proxy(req: NextRequest) {
   if (pathname.startsWith("/api/auth")) return NextResponse.next();
 
   // Allow static assets
-  if (pathname.startsWith("/_next") || pathname.startsWith("/images") || pathname.match(/\.(ico|png|svg|jpg|jpeg|gif|webp|css|js)$/)) {
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/images") ||
+    pathname.match(/\.(ico|png|svg|jpg|jpeg|gif|webp|css|js)$/)
+  ) {
     return NextResponse.next();
   }
 
-  const secret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET ?? "";
-
-  let token = null;
-  try {
-    token = await getToken({ req, secret });
-  } catch {
-    token = null;
-  }
-
-  const isAuthenticated = !!token;
+  // Use NextAuth v5's auth() to read the session — getToken() is v4 only
+  // and cannot decrypt the v5 encrypted cookie (authjs.session-token)
+  const session = await auth();
+  const isAuthenticated = !!session?.user;
 
   // Redirect authenticated users away from public pages
   if (PUBLIC_PAGES.some((p) => pathname.startsWith(p))) {
@@ -41,14 +39,9 @@ export default async function proxy(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const url = new URL("/login", req.url);
-    // Only set callbackUrl for non-auth pages to avoid redirect loops
-    if (!PUBLIC_PAGES.some((p) => pathname.startsWith(p))) {
-      url.searchParams.set("callbackUrl", pathname);
-    }
+    url.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(url);
   }
 
   return NextResponse.next();
 }
-
-

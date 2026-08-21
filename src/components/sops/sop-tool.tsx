@@ -157,7 +157,7 @@ const SOPGenerativePanel: FC<ToolCallMessagePartProps<SOPArgs, SOPResult>> = ({
         <div className="min-w-0">
           <div className="flex items-center gap-2 flex-wrap mb-0.5">
             {/* AI Generated badge */}
-            <Badge variant="secondary" className="text-[10px]">
+            <Badge className="text-[10px] bg-purple-600 text-white">
               AI Generated
             </Badge>
             {args.industry && (

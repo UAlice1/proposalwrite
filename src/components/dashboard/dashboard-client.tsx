@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  FileText, Plus, Sparkles, Clock, CheckCircle,
+  FileText, Plus, Clock, CheckCircle,
   ArrowRight, PenLine, GitMerge, Activity,
 } from "lucide-react";
 import { STATUS_LABELS, STATUS_COLORS, PROPOSAL_TYPE_LABELS, timeAgo } from "@/lib/utils";
@@ -165,9 +165,9 @@ export function DashboardClient({ userName }: { userName: string }) {
       {/* Quick actions */}
       {canCreate && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-          <QuickAction icon={<Sparkles className="w-4 h-4 text-purple-500" />} title="Generate with AI" desc="Describe a project, get a full proposal" href="/proposals/new" />
+          <QuickAction icon={<div className="w-2.5 h-2.5 rounded-full bg-black" />} title="Generate with AI" desc="Describe a project, get a full proposal" href="/proposals/new" />
           <QuickAction icon={<PenLine className="w-4 h-4 text-blue-500" />}    title="New Proposal"      desc="Start from scratch"                  href="/proposals/new" />
-          <QuickAction icon={<FileText className="w-4 h-4 text-green-500" />}  title="All Proposals"     desc="Browse your proposal library"         href="/proposals" />
+          <QuickAction icon={<div className="w-2.5 h-2.5 rounded-full bg-green-500" />}  title="All Proposals"     desc="Browse your proposal library"         href="/proposals" />
         </div>
       )}
 
@@ -215,9 +215,6 @@ function RecentProposalsCard({ proposals, loading, canCreate }: { proposals: Rec
           <div className="px-4 pb-4 space-y-3">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-lg" />)}</div>
         ) : proposals.length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-10 px-4">
-            <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center">
-              <FileText className="w-6 h-6 text-muted-foreground" />
-            </div>
             <p className="text-sm font-medium">No proposals yet</p>
             <p className="text-xs text-muted-foreground text-center">
               {canCreate ? "Create your first proposal or generate one with AI." : "No proposals have been created yet."}
@@ -230,9 +227,6 @@ function RecentProposalsCard({ proposals, loading, canCreate }: { proposals: Rec
           <div className="divide-y divide-border max-h-[280px] overflow-y-auto">
             {proposals.map((p) => (
               <Link key={p.id} href={`/proposals/${p.id}`} className="flex items-center gap-3 px-4 py-3 transition-colors">
-                <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                  <FileText className="w-4 h-4 text-muted-foreground" />
-                </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{p.title}</p>
                   <p className="text-xs text-muted-foreground">

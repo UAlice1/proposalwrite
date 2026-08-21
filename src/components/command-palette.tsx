@@ -82,7 +82,6 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                   onClick={() => navigate(`/proposals/${p.id}`)}
                   className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-accent text-left text-sm"
                 >
-                  <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
                   <span className="truncate">{p.title}</span>
                   <span className="ml-auto text-xs text-muted-foreground">{p.status}</span>
                 </button>

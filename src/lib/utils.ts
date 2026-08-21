@@ -48,11 +48,11 @@ export const STATUS_LABELS: Record<string, string> = {
 
 export const STATUS_COLORS: Record<string, string> = {
   DRAFT:    "bg-yellow-400 text-yellow-900",
-  REVIEW:   "bg-blue-500 text-white",
-  SENT:     "bg-purple-500 text-white",
-  ACCEPTED: "bg-green-500 text-white",
-  REJECTED: "bg-red-500 text-white",
-  ARCHIVED: "bg-gray-500 text-white",
+  REVIEW:   "bg-blue-600 text-white",
+  SENT:     "bg-purple-600 text-white",
+  ACCEPTED: "bg-green-600 text-white",
+  REJECTED: "bg-red-600 text-white",
+  ARCHIVED: "bg-gray-600 text-white",
 };
 
 export const PROPOSAL_TYPE_LABELS: Record<string, string> = {

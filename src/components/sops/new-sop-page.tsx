@@ -151,9 +151,6 @@ export function NewSOPPage() {
 
             {/* Card header with icon */}
             <div className="flex items-center gap-3 px-7 pt-6 pb-5">
-              <div className="w-7 h-7 rounded-xl bg-primary flex items-center justify-center shrink-0">
-                <FileText className="w-3.5 h-3.5 text-white" />
-              </div>
               <div>
                 <h2 className="text-base font-semibold">Create New SOP</h2>
                 <p className="text-sm text-muted-foreground">Fill in the details below and our AI will generate a complete SOP for you.</p>
@@ -223,7 +220,7 @@ export function NewSOPPage() {
           {/* Action buttons */}
           <div className="flex items-center justify-end gap-3 mt-5">
             <Button type="button" variant="outline" onClick={onSaveDraft} disabled={savingDraft || loading} className="gap-2">
-              {savingDraft ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
+              {savingDraft ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
               Save Draft
             </Button>
             <Button type="button" onClick={onGenerate} disabled={loading || savingDraft} className="gap-2">

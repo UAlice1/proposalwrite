@@ -55,7 +55,7 @@ function NavItem({
       href={href}
       onClick={onNavigate}
       className={cn(
-        "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
+        "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
         isActive
           ? "bg-primary text-white font-medium"
           : "text-[var(--sidebar-foreground)]/70",
@@ -163,7 +163,7 @@ export function AppSidebarContent({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-[var(--sidebar-accent)] transition-all text-left group border border-[var(--sidebar-border)]"
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-[var(--sidebar-accent)] transition-all text-left group border border-[var(--sidebar-border)] focus:outline-none focus-visible:ring-0"
               aria-label="User menu"
             >
               <Avatar className="w-9 h-9 shrink-0 ring-2 ring-primary/30">
@@ -252,7 +252,7 @@ function CollapsedSidebar({ user }: { user: NextAuthUser }) {
             href={href}
             title={label}
             className={cn(
-              "flex items-center justify-center w-9 h-9 rounded-lg transition-colors",
+              "flex items-center justify-center w-9 h-9 rounded-md transition-colors",
               isActive
                 ? "bg-[var(--sidebar-accent)] text-[var(--sidebar-foreground)]"
                 : "text-[var(--sidebar-foreground)]/60",
@@ -271,7 +271,7 @@ function CollapsedSidebar({ user }: { user: NextAuthUser }) {
         <DropdownMenuTrigger asChild>
           <button
             title={`${user.name} — ${user.email}`}
-            className="flex items-center justify-center w-9 h-9 rounded-lg transition-colors mb-1"
+            className="flex items-center justify-center w-9 h-9 rounded-lg transition-colors mb-1 focus:outline-none focus-visible:ring-0"
             aria-label="User menu"
           >
             <Avatar className="w-7 h-7">

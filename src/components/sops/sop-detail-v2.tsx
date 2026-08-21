@@ -200,9 +200,9 @@ export function SOPDetailV2({ id }: { id: string }) {
       {/* ── SOP title block ─────────────────────────────────────── */}
       <div className="px-3 pt-4 pb-2 md:px-6 shrink-0">
         <div className="flex items-center gap-2 mb-2 flex-wrap">
-          {sop.isAIGenerated && <Badge variant="secondary" className="text-xs">AI Generated</Badge>}
-          {sop.industry && <Badge variant="outline" className="text-xs">{sop.industry}</Badge>}
-          {sop.complianceFramework && <Badge variant="outline" className="text-xs">{sop.complianceFramework}</Badge>}
+          {sop.isAIGenerated && <Badge className="text-xs bg-purple-600 text-white">AI Generated</Badge>}
+          {sop.industry && <Badge className="text-xs bg-blue-600 text-white">{sop.industry}</Badge>}
+          {sop.complianceFramework && <Badge className="text-xs bg-teal-600 text-white">{sop.complianceFramework}</Badge>}
         </div>
         <h1 className="text-2xl font-bold text-foreground leading-tight">{sop.title}</h1>
         {sop.description && <p className="text-sm text-muted-foreground mt-1">{sop.description}</p>}

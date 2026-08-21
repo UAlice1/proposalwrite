@@ -1,26 +1,38 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import Link from "next/link";
+import Link from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  Plus, Search, FileText, Star, MoreHorizontal,
+  Plus, Search, Star, MoreHorizontal,
   Copy, Archive, Trash2, Eye, X,
   ChevronLeft, ChevronRight,
 } from "lucide-react";
-import { STATUS_LABELS, STATUS_COLORS, PROPOSAL_TYPE_LABELS, timeAgo, truncate } from "@/lib/utils";
+import { STATUS_LABELS, STATUS_COLORS, PROPOSAL_TYPE_LABELS, timeAgo } from "@/lib/utils";
 import { useDebounce } from "@/hooks/use-debounce";
 import { ProposalToast } from "@/lib/toast";
+import type { ColumnDef } from "@/components/kibo-ui/table";
+import {
+  TableBody,
+  TableCell,
+  TableColumnHeader,
+  TableHead,
+  TableHeader,
+  TableHeaderGroup,
+  TableProvider,
+  TableRow,
+} from "@/components/kibo-ui/table";
 
 interface Proposal {
   id: string;
@@ -40,6 +52,7 @@ interface Proposal {
 const EMPTY_FILTERS = { status: "", proposalType: "" };
 
 export function ProposalsClient() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const filterParam  = searchParams.get("filter") ?? "";
 
@@ -49,7 +62,7 @@ export function ProposalsClient() {
   const [search,      setSearch]      = useState("");
   const [filters,     setFilters]     = useState(EMPTY_FILTERS);
   const [currentPage, setCurrentPage] = useState(1);
-  const PAGE_SIZE = 6;
+  const PAGE_SIZE = 10;
 
   const debouncedSearch = useDebounce(search, 350);
 
@@ -119,6 +132,99 @@ export function ProposalsClient() {
               : filterParam === "archived"  ? "Archived"
               : "My Proposals";
 
+  const columns: ColumnDef<Proposal>[] = [
+    {
+      accessorKey: "title",
+      header: ({ column }) => (
+        <TableColumnHeader column={column} title="Proposal" />
+      ),
+      cell: ({ row }) => (
+        <div className="flex items-center gap-3">
+          <Avatar className="size-8">
+            <AvatarImage src={row.original.author.image ?? ""} />
+            <AvatarFallback className="text-xs">
+              {row.original.author.name?.slice(0, 2)?.toUpperCase() ?? "?"}
+            </AvatarFallback>
+          </Avatar>
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="font-medium text-sm truncate">{row.original.title}</span>
+              {row.original.isFavorite && (
+                <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500 shrink-0" />
+              )}
+            </div>
+            <div className="text-xs text-muted-foreground truncate">
+              {row.original.clientName || "No client"} · {row.original._count.sections} sections
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      accessorKey: "proposalType",
+      header: ({ column }) => (
+        <TableColumnHeader column={column} title="Type" />
+      ),
+      cell: ({ row }) => (
+        <span className="text-sm">
+          {PROPOSAL_TYPE_LABELS[row.original.proposalType] ?? row.original.proposalType}
+        </span>
+      ),
+    },
+    {
+      accessorKey: "status",
+      header: ({ column }) => (
+        <TableColumnHeader column={column} title="Status" />
+      ),
+      cell: ({ row }) => (
+        <Badge className={`text-xs ${STATUS_COLORS[row.original.status]}`}>
+          {STATUS_LABELS[row.original.status]}
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: "updatedAt",
+      header: ({ column }) => (
+        <TableColumnHeader column={column} title="Updated" />
+      ),
+      cell: ({ row }) => (
+        <span className="text-sm text-muted-foreground">
+          {timeAgo(row.original.updatedAt)}
+        </span>
+      ),
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-7 w-7">
+              <MoreHorizontal className="w-4 h-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => router.push(`/proposals/${row.original.id}`)}>
+              <Eye className="w-4 h-4 mr-2" />View
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleToggleFavorite(row.original.id, row.original.isFavorite)}>
+              <Star className="w-4 h-4 mr-2" />{row.original.isFavorite ? "Unfavorite" : "Favorite"}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleDuplicate(row.original.id)}>
+              <Copy className="w-4 h-4 mr-2" />Duplicate
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleArchive(row.original.id, row.original.isArchived)}>
+              <Archive className="w-4 h-4 mr-2" />{row.original.isArchived ? "Restore" : "Archive"}
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => handleDelete(row.original.id)} className="text-destructive focus:text-destructive">
+              <Trash2 className="w-4 h-4 mr-2" />Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+    },
+  ];
+
   return (
     <div className="space-y-4 max-w-6xl mx-auto">
       {/* Header */}
@@ -128,7 +234,7 @@ export function ProposalsClient() {
           <p className="text-muted-foreground text-sm">{total} proposal{total !== 1 ? "s" : ""}</p>
         </div>
         <Button asChild size="sm">
-          <Link href="/proposals/new"><Plus className="w-4 h-4 mr-1.5" />New Proposal</Link>
+          <a href="/proposals/new"><Plus className="w-4 h-4 mr-1.5" />New Proposal</a>
         </Button>
       </div>
 
@@ -137,6 +243,7 @@ export function ProposalsClient() {
         <div className="relative flex-1 min-w-0">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input value={search} onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
+            placeholder="Search proposals..."
             className="pl-9 h-9" />
           {search && (
             <button className="absolute right-3 top-1/2 -translate-y-1/2" onClick={() => setSearch("")}>
@@ -176,84 +283,46 @@ export function ProposalsClient() {
         )}
       </div>
 
-      {/* List */}
+      {/* Table */}
       {loading ? (
         <div className="space-y-3">
-          {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-20 w-full rounded-xl" />)}
+          {[...Array(10)].map((_, i) => <Skeleton key={i} className="h-16 w-full" />)}
         </div>
       ) : proposals.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 py-20">
-          <div className="w-14 h-14 rounded-xl bg-muted flex items-center justify-center">
-            <FileText className="w-7 h-7 text-muted-foreground" />
-          </div>
+        <div className="flex flex-col items-center gap-3 py-20 border rounded-lg">
           <p className="font-medium">No proposals found</p>
           <p className="text-sm text-muted-foreground">
             {activeFilterCount > 0 ? "Try adjusting or clearing your filters." : "Create your first proposal to get started."}
           </p>
           {activeFilterCount > 0
             ? <Button size="sm" variant="outline" onClick={clearAll}><X className="w-4 h-4 mr-1.5" />Clear filters</Button>
-            : <Button asChild size="sm"><Link href="/proposals/new"><Plus className="w-4 h-4 mr-1.5" />New Proposal</Link></Button>}
+            : <Button asChild size="sm"><a href="/proposals/new"><Plus className="w-4 h-4 mr-1.5" />New Proposal</a></Button>}
         </div>
       ) : (
-        <AnimatePresence mode="popLayout">
-          <div className="space-y-2">
-            {proposals.map((proposal, i) => (
-              <motion.div key={proposal.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ delay: i * 0.03 }}>
-                <div className="flex items-center gap-4 p-4 bg-card border border-border rounded-xl transition-all group">
-                  <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                    <FileText className="w-4 h-4 text-muted-foreground" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                      <Link href={`/proposals/${proposal.id}`} className="font-medium text-sm hover:text-foreground truncate">
-                        {proposal.title}
-                      </Link>
-                      {proposal.isFavorite && <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500 shrink-0" />}
-                      <span className="text-[10px] px-1.5 py-0.5 rounded-full border border-border bg-muted text-muted-foreground shrink-0">
-                        {PROPOSAL_TYPE_LABELS[proposal.proposalType] ?? proposal.proposalType}
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground truncate">
-                      {proposal.clientName ? `For ${proposal.clientName}` : "No client"}
-                      {` · ${proposal._count.sections} section${proposal._count.sections !== 1 ? "s" : ""}`}
-                      {` · Updated ${timeAgo(proposal.updatedAt)}`}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <Badge className={`text-xs ${STATUS_COLORS[proposal.status]}`}>
-                      {STATUS_LABELS[proposal.status]}
-                    </Badge>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <MoreHorizontal className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem asChild>
-                          <Link href={`/proposals/${proposal.id}`}><Eye className="w-4 h-4 mr-2" />View</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleToggleFavorite(proposal.id, proposal.isFavorite)}>
-                          <Star className="w-4 h-4 mr-2" />{proposal.isFavorite ? "Unfavorite" : "Favorite"}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDuplicate(proposal.id)}>
-                          <Copy className="w-4 h-4 mr-2" />Duplicate
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleArchive(proposal.id, proposal.isArchived)}>
-                          <Archive className="w-4 h-4 mr-2" />{proposal.isArchived ? "Restore" : "Archive"}
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => handleDelete(proposal.id)} className="text-destructive focus:text-destructive">
-                          <Trash2 className="w-4 h-4 mr-2" />Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </AnimatePresence>
+        <TableProvider columns={columns} data={proposals}>
+          <TableHeader>
+            {({ headerGroup }) => (
+              <TableHeaderGroup headerGroup={headerGroup} key={headerGroup.id}>
+                {({ header }) => <TableHead header={header} key={header.id} />}
+              </TableHeaderGroup>
+            )}
+          </TableHeader>
+          <TableBody>
+            {({ row }) => (
+              <div 
+                onClick={() => router.push(`/proposals/${row.original.id}`)}
+                className="cursor-pointer"
+              >
+                <TableRow 
+                  key={row.id} 
+                  row={row}
+                >
+                  {({ cell }) => <TableCell cell={cell} key={cell.id} />}
+                </TableRow>
+              </div>
+            )}
+          </TableBody>
+        </TableProvider>
       )}
 
       {/* Pagination */}

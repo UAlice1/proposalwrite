@@ -335,9 +335,6 @@ export function SOPsClient() {
         </div>
       ) : sops.length === 0 ? (
         <div className="flex flex-col items-center gap-3 py-20">
-          <div className="w-14 h-14 rounded-xl bg-muted flex items-center justify-center">
-            <FileText className="w-7 h-7 text-muted-foreground" />
-          </div>
           <p className="font-medium">No SOPs found</p>
           <p className="text-sm text-muted-foreground">
             {activeFilterCount > 0 ? "Try adjusting or clearing your filters." : "Create your first SOP to get started."}
@@ -352,10 +349,6 @@ export function SOPsClient() {
             {sops.map((sop, i) => (
               <motion.div key={sop.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ delay: i * 0.03 }}>
                 <div className="flex items-center gap-4 p-4 bg-card border border-border rounded-xl hover:border-border hover:shadow-sm transition-all group">
-                  <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                    <FileText className="w-4 h-4 text-muted-foreground" />
-                  </div>
-
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                       <Link href={`/sops/${sop.id}`} className="font-medium text-sm hover:text-foreground truncate">

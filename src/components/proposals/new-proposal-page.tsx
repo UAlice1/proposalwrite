@@ -162,9 +162,6 @@ export function NewProposalPage() {
         <div className="w-full max-w-2xl">
           <div className="bg-card border border-border rounded-2xl shadow-[0_2px_16px_rgba(0,0,0,0.08)] overflow-hidden">
             <div className="flex items-center gap-3 px-7 pt-6 pb-5">
-              <div className="w-7 h-7 rounded-xl bg-primary flex items-center justify-center shrink-0">
-                <FileText className="w-3.5 h-3.5 text-white" />
-              </div>
               <div>
                 <h2 className="text-base font-semibold">Create New Proposal</h2>
                 <p className="text-sm text-muted-foreground">Fill in the details and our AI will generate a complete proposal for you.</p>
