@@ -1,40 +1,66 @@
-# Pryro SOP — AI-Powered SOP Generator
+# PryroProposal — AI-Powered Proposal Generator
 
-A production-ready AI-powered platform for creating, managing, and exporting professional Standard Operating Procedures.
+A production-ready AI-powered platform for creating, managing, and exporting professional business proposals.
 
-## Features
+## ✨ Features
 
-- **AI SOP Generation** — Describe a process in plain English; AI generates a complete professional SOP
-- **AI Writing Tools** — Improve, rewrite, fix grammar, summarize, simplify, translate any section
+### 🤖 AI-Powered Generation
+- **AI Proposal Generation** — Describe your project in plain English; AI generates a complete professional proposal
+- **AI Writing Tools** — Improve, rewrite, fix grammar, and refine any section
 - **Multi-Provider AI** — OpenAI, Anthropic, Groq, OpenRouter, DeepSeek, Mistral, custom OpenAI-compatible APIs
-- **Full SOP Editor** — Edit every section: purpose, scope, workflow, checklist, responsibilities, resources
-- **SOP Management** — Create, edit, duplicate, archive, favorite, delete, search, filter
-- **Export** — Export SOPs as professionally formatted HTML (printable as PDF)
-- **Comments** — Comment threads on each SOP
-- **Activity Log** — Full audit trail of all changes
-- **Dashboard** — Stats, recent SOPs, activity feed, AI usage tracking
-- **Command Palette** — ⌘K quick navigation and SOP search
-- **Dark / Light Mode** — System-aware theme switching
-- **Responsive** — Works on desktop and mobile
+- **Smart Regeneration** — Regenerate individual sections with AI while keeping others
 
-## Tech Stack
+### 📝 Proposal Management
+- **Full Proposal Editor** — Edit title, client info, budget, timeline, and all sections
+- **Multiple Proposal Types** — Consulting, Construction, Creative, IT/Software, Freelance, General
+- **Tone Preferences** — Professional, Conversational, or Executive writing styles
+- **Version Control** — Track changes and maintain proposal history
+- **Status Tracking** — Draft, Review, Sent, Accepted, Rejected, Archived
+
+### 📊 Organization & Workflow
+- **Table View** — Modern sortable table with avatars, status badges, and quick actions
+- **Search & Filter** — Find proposals by name, status, type, or client
+- **Favorites** — Star important proposals for quick access
+- **Activity Log** — Full audit trail of all changes
+- **Dashboard** — Stats, recent proposals, activity feed, AI usage tracking
+
+### 🎨 User Experience
+- **Clean Modern UI** — Minimal design with consistent blue branding
+- **Dark / Light Mode** — System-aware theme switching
+- **Command Palette** — ⌘K quick navigation and proposal search
+- **Responsive Design** — Works perfectly on desktop, tablet, and mobile
+
+### 📤 Export & Sharing
+- **Multiple Formats** — Export as PDF, DOCX (Word), HTML, or Markdown
+- **Professional Formatting** — Clean, branded export templates
+- **Print-Ready** — Optimized for professional printing
+
+### 👥 Collaboration
+- **Comments** — Comment threads on each proposal
+- **Team Management** — Role-based access (Admin, Manager, Employee)
+- **Organization Support** — Multi-user organizations with shared proposals
+- **Activity Feed** — See who's working on what
+
+## 🛠️ Tech Stack
 
 - **Framework**: Next.js 16 (App Router, Server Components)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS v4
-- **UI Components**: Radix UI primitives
+- **UI Components**: Radix UI primitives + Custom Kibo UI table
 - **Animations**: Framer Motion
-- **Auth**: NextAuth v5 (JWT strategy)
-- **Database**: PostgreSQL + Prisma ORM
-- **Forms**: React Hook Form + Zod
+- **Auth**: NextAuth v5 (JWT strategy, Google OAuth)
+- **Database**: PostgreSQL (Neon) + Prisma ORM
+- **Forms**: React Hook Form + Zod validation
 - **State**: TanStack Query
+- **AI Integration**: Groq, OpenAI, and custom providers
 
-## Setup
+## 🚀 Quick Start
 
 ### 1. Prerequisites
 
 - Node.js 18+
-- PostgreSQL 14+ running locally or remotely
+- PostgreSQL 14+ (or Neon serverless)
+- npm or yarn
 
 ### 2. Install dependencies
 
@@ -44,124 +70,238 @@ npm install
 
 ### 3. Configure environment
 
-Edit `.env`:
+Create a `.env` file:
 
 ```env
-DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/pryro_sop"
+# Database
+DATABASE_URL="your_postgresql_connection_string"
+
+# NextAuth
+AUTH_URL="http://localhost:3000"
 NEXTAUTH_URL="http://localhost:3000"
-NEXTAUTH_SECRET="generate-a-32-char-secret-here"
+NEXTAUTH_SECRET="your-secret-key-here"
+AUTH_SECRET="your-auth-secret-here"
+
+# Google OAuth (optional)
+GOOGLE_CLIENT_ID="your_google_client_id"
+GOOGLE_CLIENT_SECRET="your_google_client_secret"
+
+# AI Provider (Groq recommended)
+GROQ_API_KEY="your_groq_api_key"
+
+# Email (optional - for notifications)
+EMAIL_FROM="your-email@example.com"
+GMAIL_USER="your-email@gmail.com"
+GMAIL_APP_PASSWORD="your_app_password"
 ```
 
-Generate a secret:
+Generate secrets:
 ```bash
-openssl rand -base64 32
+openssl rand -base64 32  # For NEXTAUTH_SECRET
+openssl rand -base64 32  # For AUTH_SECRET
 ```
 
-### 4. Create the database
-
-```sql
-CREATE DATABASE pryro_sop;
-```
-
-### 5. Run migrations
+### 4. Set up database
 
 ```bash
-npx prisma migrate dev --name init
-```
+# Run migrations
+npx prisma migrate deploy
 
-### 6. Generate Prisma client
-
-```bash
+# Generate Prisma client
 npx prisma generate
 ```
 
-### 7. Start development server
+### 5. Seed sample data (optional)
+
+```bash
+npm run seed
+```
+
+This creates 8 sample proposals for testing.
+
+### 6. Start development server
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000)
 
-## AI Configuration
-
-After signing up, go to **Settings → AI Provider** to configure your AI keys:
-
-| Provider | Models |
-|----------|--------|
-| OpenAI | gpt-4o, gpt-4o-mini, gpt-4-turbo |
-| Anthropic | claude-3-5-sonnet, claude-3-haiku |
-| Groq | llama-3.3-70b, mixtral-8x7b |
-| OpenRouter | Any model |
-| DeepSeek | deepseek-chat, deepseek-reasoner |
-| Mistral | mistral-large, mistral-small |
-| Custom | Any OpenAI-compatible API |
-
-API keys are stored encrypted in the database per user.
-
-## Project Structure
+## 📊 Project Structure
 
 ```
 src/
 ├── app/
-│   ├── (auth)/          # Login, register pages
-│   ├── (app)/           # Protected app pages
-│   │   ├── dashboard/   # Dashboard
-│   │   ├── sops/        # SOP list, new, detail
-│   │   └── settings/    # AI & profile settings
-│   └── api/             # API routes
-│       ├── ai/          # generate, improve, settings
-│       ├── auth/        # NextAuth + register
-│       ├── sops/        # CRUD + workflow/checklist/comments
-│       └── dashboard/   # Stats
+│   ├── (auth)/              # Login, register, password reset
+│   ├── (app)/               # Protected app pages
+│   │   ├── dashboard/       # Dashboard with stats
+│   │   ├── proposals/       # Proposal list, new, detail
+│   │   │   ├── new/         # Create new proposal
+│   │   │   └── [id]/        # View/edit proposal
+│   │   ├── settings/        # AI & profile settings
+│   │   └── assistant/       # AI assistant
+│   └── api/                 # API routes
+│       ├── ai/              # AI generation & tools
+│       ├── auth/            # NextAuth + registration
+│       ├── proposals/       # CRUD + sections + export
+│       └── dashboard/       # Stats & analytics
 ├── components/
-│   ├── ui/              # All UI primitives (Radix-based)
-│   ├── layout/          # Sidebar + header
-│   ├── sops/            # SOP editor, workflow, checklist, etc.
-│   ├── dashboard/       # Dashboard client
-│   ├── settings/        # Settings forms
-│   └── auth/            # Login/register forms
+│   ├── ui/                  # Base UI components (Radix)
+│   ├── kibo-ui/            # Custom table component
+│   ├── layout/              # Sidebar, header, navigation
+│   ├── proposals/           # Proposal editor & list
+│   ├── dashboard/           # Dashboard widgets
+│   ├── settings/            # Settings forms
+│   └── auth/                # Auth forms
 ├── lib/
-│   ├── db.ts            # Prisma client
-│   ├── auth.ts          # NextAuth config
-│   ├── ai.ts            # AI provider abstraction
-│   └── utils.ts         # Helpers + constants
-└── hooks/
-    └── use-debounce.ts
+│   ├── db.ts               # Prisma client
+│   ├── auth.ts             # NextAuth configuration
+│   ├── ai.ts               # AI provider abstraction
+│   ├── utils.ts            # Helpers & constants
+│   └── toast.ts            # Toast notifications
+├── hooks/
+│   └── use-debounce.ts     # Debounce hook
+└── prisma/
+    ├── schema.prisma        # Database schema
+    ├── seed.ts             # Sample data seeder
+    └── migrations/         # Database migrations
 ```
 
-## Database Schema
+## 🗄️ Database Schema
 
-Key models:
-- **User** — Authentication, role, org membership
-- **SOP** — Main document with status, versioning
-- **SOPSection** — Document sections (purpose, scope, etc.)
-- **WorkflowStep** — Ordered process steps
-- **ChecklistItem** — Verification checklist
-- **Responsibility** — Roles & responsibilities
-- **Resource** — Required resources/tools
-- **Comment** — Threaded comments
-- **Activity** — Audit log
-- **AIGeneration** — AI usage tracking
-- **AISettings** — Per-user AI provider config
-- **ExportHistory** — Export tracking
+### Core Models
 
-## Scripts
+- **User** — Authentication, roles, organization membership
+- **Organization** — Team/company with multiple users
+- **Proposal** — Main proposal document with metadata
+- **ProposalSection** — Individual proposal sections (executive summary, scope, deliverables, etc.)
+- **ProposalVersion** — Version history and change tracking
+- **Activity** — Audit log for all actions
+- **AIGeneration** — Track AI usage and costs
+- **AISettings** — Per-user AI provider configuration
+- **ExportHistory** — Track exports for analytics
+
+### Proposal Types
+
+- Consulting
+- Construction  
+- Creative
+- IT/Software
+- Freelance
+- General
+
+### Proposal Statuses
+
+- Draft — Work in progress
+- Review — Ready for review
+- Sent — Sent to client
+- Accepted — Won! 🎉
+- Rejected — Not this time
+- Archived — Historical record
+
+## 🎨 AI Configuration
+
+After signing up, go to **Settings → AI Provider** to configure:
+
+| Provider | Best For | Models |
+|----------|----------|--------|
+| **Groq** (Recommended) | Fast & Free | llama-3.3-70b-versatile |
+| OpenAI | Highest Quality | gpt-4o, gpt-4-turbo |
+| Anthropic | Long Documents | claude-3-5-sonnet |
+| OpenRouter | Variety | 100+ models |
+| Custom | Self-hosted | Any OpenAI-compatible API |
+
+API keys are stored encrypted per user.
+
+## 📜 Available Scripts
 
 ```bash
-npm run dev          # Start development server
-npm run build        # Production build
-npm run start        # Start production server
-npm run lint         # Run ESLint
-npx prisma studio    # Open Prisma database GUI
-npx prisma migrate dev  # Run pending migrations
+npm run dev              # Start development server
+npm run build           # Production build
+npm run start           # Start production server
+npm run lint            # Run ESLint
+npm run seed            # Seed sample proposals
+npx prisma studio       # Open database GUI
+npx prisma migrate dev  # Create/run migrations
 ```
 
-## Deployment
+## 🚀 Deployment
 
-The app is ready to deploy to any Node.js host (Vercel, Railway, Render, etc.).
+### Vercel (Recommended)
 
-Set these environment variables in production:
-- `DATABASE_URL` — PostgreSQL connection string
-- `NEXTAUTH_URL` — Your production URL
-- `NEXTAUTH_SECRET` — A strong random secret (32+ chars)
+1. Push code to GitHub
+2. Import project to Vercel
+3. Add environment variables (see `.env` example)
+4. Set `AUTH_URL` to your production domain
+5. Deploy!
+
+### Environment Variables for Production
+
+```env
+# REQUIRED
+DATABASE_URL=your_production_database_url
+AUTH_URL=https://your-domain.vercel.app
+NEXTAUTH_URL=https://your-domain.vercel.app
+NEXTAUTH_SECRET=your-strong-secret
+AUTH_SECRET=your-auth-secret
+GROQ_API_KEY=your_groq_api_key
+
+# OPTIONAL
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+EMAIL_FROM=your-email@example.com
+GMAIL_USER=your-email@gmail.com
+GMAIL_APP_PASSWORD=your_app_password
+```
+
+**Important:** Don't forget to update Google OAuth redirect URIs:
+```
+https://your-domain.vercel.app/api/auth/callback/google
+```
+
+## 🎯 Key Features in Detail
+
+### Table View
+- Sortable columns (Name, Type, Status, Updated)
+- Author avatars
+- Status badges with color coding
+- Quick actions menu (View, Favorite, Duplicate, Archive, Delete)
+- Search and advanced filtering
+- Pagination
+
+### AI Generation
+- Describe project in natural language
+- Select proposal type and tone
+- AI generates complete proposal with multiple sections
+- Edit individual sections
+- Regenerate sections independently
+
+### Export Options
+- **PDF** — Print-ready professional format
+- **DOCX** — Editable Microsoft Word document
+- **HTML** — Web-ready format
+- **Markdown** — Plain text with formatting
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is proprietary software. All rights reserved.
+
+## 🆘 Support
+
+For issues, questions, or feature requests, please:
+- Open an issue on GitHub
+- Contact: pryrolab@gmail.com
+
+---
+
+Built with ❤️ by PryroLab
+
+**PryroProposal** — Professional proposals, powered by AI
